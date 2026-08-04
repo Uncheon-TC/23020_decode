@@ -8,10 +8,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class MecanumDrive {
 
     private DcMotor FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
+    private double driverHeadingRadians;
 
     GoBildaPinpoint GobildaPinpoint = new GoBildaPinpoint();
 
-    public void init(HardwareMap hwMap){
+    public void init(HardwareMap hwMap, Pose2D startingPosition){
         FrontLeftMotor = hwMap.get(DcMotor.class, "FL");
         FrontRightMotor = hwMap.get(DcMotor.class, "FR");
         BackLeftMotor = hwMap.get(DcMotor.class, "BL");
@@ -25,11 +26,19 @@ public class MecanumDrive {
         BackLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BackRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        GobildaPinpoint.init(hwMap);
+        GobildaPinpoint.init(hwMap, startingPosition);
     }
 
     public Pose2D getTraditionalPose() {
         return GobildaPinpoint.getTraditionalPose();
+    }
+
+    public void setPosition(Pose2D position) {
+        GobildaPinpoint.setPosition(position);
+    }
+
+    public void setDriverHeadingDegrees(double headingDegrees) {
+        driverHeadingRadians = Math.toRadians(headingDegrees);
     }
 
     public void MoveRobot(double y, double x, double rx){
@@ -38,9 +47,10 @@ public class MecanumDrive {
         Pose2D position = GobildaPinpoint.ODO.getPosition();
         double botHeading = position.getHeading(AngleUnit.RADIANS);
 
-        // 2. 필드 센트릭 회전 변환 (FTC 공식 샘플 적용)
-        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+        // 2. 플레이어 시점을 반영한 필드 센트릭 회전 변환
+        double fieldRotation = driverHeadingRadians - botHeading;
+        double rotX = x * Math.cos(fieldRotation) - y * Math.sin(fieldRotation);
+        double rotY = x * Math.sin(fieldRotation) + y * Math.cos(fieldRotation);
 
         rotX = rotX * 1.1;  // 대각선 스트레이프 보정
 

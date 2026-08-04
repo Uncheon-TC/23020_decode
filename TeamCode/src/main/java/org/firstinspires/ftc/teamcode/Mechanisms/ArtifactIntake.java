@@ -7,8 +7,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class ArtifactIntake {
 
+    public enum State {
+        IDLE,
+        INTAKING,
+        OUTTAKING
+    }
+
     private DcMotor FrontEaterMotor, BackEaterMotor;
     private Servo ArtifactLid;
+    private State state = State.IDLE;
 
     public void init(HardwareMap hwMap){
 
@@ -27,12 +34,32 @@ public class ArtifactIntake {
 
     }
 
-    public void setPower(double frontPower, double backPower, double lidPosition){
+    public void setState(State newState) {
+        state = newState;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void update() {
+        switch (state) {
+            case INTAKING:
+                setPower(0.7, 0.3, 0.5);
+                break;
+            case OUTTAKING:
+                setPower(1, 1, 0.0);
+                break;
+            case IDLE:
+            default:
+                setPower(0, 0, 0.5);
+                break;
+        }
+    }
+
+    private void setPower(double frontPower, double backPower, double lidPosition){
         FrontEaterMotor.setPower(frontPower);
         BackEaterMotor.setPower(backPower);
         ArtifactLid.setPosition(lidPosition);
-
-
     }
-
 }

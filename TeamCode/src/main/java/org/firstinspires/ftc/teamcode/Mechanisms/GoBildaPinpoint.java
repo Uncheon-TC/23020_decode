@@ -12,11 +12,12 @@ public class GoBildaPinpoint {
 
     GoBildaPinpointDriver ODO;
 
-    public void init(HardwareMap hwMap){
+    public void init(HardwareMap hwMap, Pose2D startingPosition){
         ODO = hwMap.get(GoBildaPinpointDriver.class, "odo");
 
         //ODO.setOffsets(,);
-        ODO.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        ODO.setEncoderResolution(
+                GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         ODO.setEncoderDirections(
                 GoBildaPinpointDriver.EncoderDirection.FORWARD,
                 GoBildaPinpointDriver.EncoderDirection.FORWARD);
@@ -24,12 +25,16 @@ public class GoBildaPinpoint {
 
         //=======TRADITIONAL FTC COORDINATE============
         ODO.resetPosAndIMU();
-        Pose2D startingPosition = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.RADIANS, Math.PI / 2 );
         ODO.setPosition(startingPosition);
 
     }
 
     public void update() {
+        ODO.update();
+    }
+
+    public void setPosition(Pose2D position) {
+        ODO.setPosition(position);
         ODO.update();
     }
 
