@@ -16,14 +16,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(11)
-            .headingPIDFCoefficients(new PIDFCoefficients(3.5, 0, 0.1, 0.015))
+            .mass(12)
             .forwardZeroPowerAcceleration(-35.550197077806075)
-            .lateralZeroPowerAcceleration(-70.75746840341202);
+            .lateralZeroPowerAcceleration(-70.75746840341202)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.09, 0, 0.001, 0.02))
+            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.01, 0.015))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.6, 0, 0.001, 0.6, 0.01))
+            .centripetalScaling(0.0005);
 
 
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.8, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(
+             0.99, 100, 1.4, 1);
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
@@ -34,7 +38,7 @@ public class Constants {
     }
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-7.8937)
+            .forwardPodY(-7.7165)
             .strafePodX(-5.8858)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("odo")

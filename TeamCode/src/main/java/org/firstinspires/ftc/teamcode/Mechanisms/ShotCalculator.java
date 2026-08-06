@@ -22,7 +22,8 @@ public class ShotCalculator {
 
     public static ShotResult calculateShot(double robotX, double robotY, double goalX, double goalY,
                                            double goalHeight, double robotVelX, double robotVelY,
-                                           double targetEntryAngle) {
+                                           double targetEntryAngle,
+                                           double turretMovementCompensation) {
         double dx = goalX - robotX;
         double dy = goalY - robotY;
         double distToGoal = Math.hypot(dx, dy);
@@ -64,7 +65,9 @@ public class ShotCalculator {
                 ? Math.sqrt(GRAVITY * Math.pow(adjustedDistance, 2) / newDenominator)
                 : v0Static;
 
-        double turretOffset = Math.atan2(tangentialVelocity, compensatedHorizontal);
+        double turretOffset = Math.atan2(
+                tangentialVelocity * turretMovementCompensation,
+                compensatedHorizontal);
         return new ShotResult(hoodAngle, launchSpeed, turretOffset, timeOfFlight, distToGoal);
     }
 }

@@ -153,6 +153,7 @@ public abstract class TeleOpTest extends OpMode {
         }
         telemetry.addData("curVelo", shooter.ShooterLeft.getVelocity());
         telemetry.addData("targetVelo", shooter.getTargetVelocity());
+        telemetry.addData("shooterPowerRatio", shooter.getAppliedPowerRatio());
         telemetry.addData("intakeState", artifactIntake.getState());
         telemetry.addData("shooterState", shooter.getState());
         telemetry.addData("activeGoal", activeGoal);

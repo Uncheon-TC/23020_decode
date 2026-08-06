@@ -11,11 +11,11 @@ public class ShooterConst {
     public static double flywheel_D = 5;
     public static double flywheel_F = 0;
 
-    public static double turret_P = 1.5;
+    public static double turret_P = 0.5;
     public static double turret_I = 0;
     public static double turret_D = 0.005;
-    public static double turret_F = 0;
-    public static double TURRET_DEADBAND_RADIANS = Math.toRadians(1);
+    public static double turret_F = 0.02;
+    public static double TURRET_DEADBAND_RADIANS = Math.toRadians(2);
     public static double TURRET_MAX_POWER = 0.7;
     public static double TURRET_INTEGRAL_LIMIT = 0.5;
     public static double TURRET_MAX_PID_DT_SECONDS = 0.1;
@@ -47,4 +47,11 @@ public class ShooterConst {
     public static double FLYWHEEL_TPR = 28; // 5000series 6000rpm motor
     public static double WHEEL_RADIUS = 1.417; // 라이노휠 큰거 1.89
     public static double SHOOTER_POWER_RATIO = 2.8;
+    public static double SHOOTER_POWER_RATIO_MAX = 2.9;
+    public static double TURRET_MOVEMENT_COMPENSATION = 1.25;
+    public static double SHOOTER_BACKWARD_VELOCITY_COMPENSATION = 1.30; // 슈터 속도 보정(이동하면서 슈팅할때 속도 값을 25% 더 강하게 반영)
+
+    // The ratio reaches its maximum at this field position.
+    public static double SHOOTER_POWER_RATIO_FAR_X = 72;
+    public static double SHOOTER_POWER_RATIO_FAR_Y = 0;
 }

@@ -29,6 +29,7 @@ public class Shooter {
     private State state = State.IDLE;
     private ElapsedTime fireTimer = new ElapsedTime();
     private double targetVelocity = TARGET_VELOCITY;
+    private double appliedPowerRatio = ShooterConst.SHOOTER_POWER_RATIO;
     private ShotCalculator.ShotResult lastShotResult;
 
     public void init(HardwareMap hwMap){
@@ -87,7 +88,26 @@ public class Shooter {
         if (robotPose == null) {
             lastShotResult = null;
             targetVelocity = TARGET_VELOCITY;
+            appliedPowerRatio = ShooterConst.SHOOTER_POWER_RATIO;
             return null;
+        }
+
+        double goalDeltaX = goalX - robotPose.getX();
+        double goalDeltaY = goalY - robotPose.getY();
+        double distanceToGoal = Math.hypot(goalDeltaX, goalDeltaY);
+        if (distanceToGoal > 0) {
+            double goalUnitX = goalDeltaX / distanceToGoal;
+            double goalUnitY = goalDeltaY / distanceToGoal;
+            double radialVelocity = robotVelocityX * goalUnitX
+                    + robotVelocityY * goalUnitY;
+
+            // Strengthen only motion away from the goal. Tangential velocity is unchanged.
+            if (radialVelocity < 0) {
+                double radialCorrection = radialVelocity
+                        * (ShooterConst.SHOOTER_BACKWARD_VELOCITY_COMPENSATION - 1.0);
+                robotVelocityX += radialCorrection * goalUnitX;
+                robotVelocityY += radialCorrection * goalUnitY;
+            }
         }
 
         ShotCalculator.ShotResult result = ShotCalculator.calculateShot(
@@ -98,11 +118,13 @@ public class Shooter {
                 ShooterConst.SCORE_HEIGHT,
                 robotVelocityX,
                 robotVelocityY,
-                ShooterConst.SCORE_ANGLE);
+                ShooterConst.SCORE_ANGLE,
+                ShooterConst.TURRET_MOVEMENT_COMPENSATION);
 
         if (result == null) {
             lastShotResult = null;
             targetVelocity = TARGET_VELOCITY;
+            appliedPowerRatio = ShooterConst.SHOOTER_POWER_RATIO;
             return null;
         }
 
@@ -111,13 +133,18 @@ public class Shooter {
                 ShooterConst.HOOD_MIN_ANGLE,
                 ShooterConst.HOOD_MAX_ANGLE);
         HoodServo.setPosition(mapAngleToServo(hoodAngle));
-        targetVelocity = velocityToTicks(result.launchSpeed) * ShooterConst.SHOOTER_POWER_RATIO;
+        appliedPowerRatio = calculatePowerRatio(result.distanceToGoal, goalX, goalY);
+        targetVelocity = velocityToTicks(result.launchSpeed) * appliedPowerRatio;
         lastShotResult = result;
         return result;
     }
 
     public double getTargetVelocity() {
         return targetVelocity;
+    }
+
+    public double getAppliedPowerRatio() {
+        return appliedPowerRatio;
     }
 
     public ShotCalculator.ShotResult getLastShotResult() {
@@ -171,6 +198,20 @@ public class Shooter {
         double wheelCircumference = 2 * Math.PI * ShooterConst.WHEEL_RADIUS;
         double wheelRevPerSecond = velocityInchesPerSecond / wheelCircumference;
         return wheelRevPerSecond * ShooterConst.FLYWHEEL_TPR;
+    }
+
+    private double calculatePowerRatio(double distanceToGoal, double goalX, double goalY) {
+        double farDistance = Math.hypot(
+                goalX - ShooterConst.SHOOTER_POWER_RATIO_FAR_X,
+                goalY - ShooterConst.SHOOTER_POWER_RATIO_FAR_Y);
+        if (farDistance <= 0) {
+            return ShooterConst.SHOOTER_POWER_RATIO;
+        }
+
+        double distanceRatio = Range.clip(distanceToGoal / farDistance, 0, 1);
+        return ShooterConst.SHOOTER_POWER_RATIO
+                + (ShooterConst.SHOOTER_POWER_RATIO_MAX
+                - ShooterConst.SHOOTER_POWER_RATIO) * distanceRatio;
     }
 
     private double mapAngleToServo(double angleRadians) {
