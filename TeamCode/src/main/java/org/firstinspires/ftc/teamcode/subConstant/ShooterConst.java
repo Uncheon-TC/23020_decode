@@ -46,8 +46,8 @@ public class ShooterConst {
 
     public static double FLYWHEEL_TPR = 28; // 5000series 6000rpm motor
     public static double WHEEL_RADIUS = 1.417; // 라이노휠 큰거 1.89
-    public static double SHOOTER_POWER_RATIO = 2.8;
-    public static double SHOOTER_POWER_RATIO_MAX = 2.9;
+    public static double SHOOTER_POWER_RATIO = 2.3;
+    public static double SHOOTER_POWER_RATIO_MAX = 2.85;
     public static double TURRET_MOVEMENT_COMPENSATION = 1.25;
     public static double SHOOTER_BACKWARD_VELOCITY_COMPENSATION = 1.30; // 슈터 속도 보정(이동하면서 슈팅할때 속도 값을 25% 더 강하게 반영)
 

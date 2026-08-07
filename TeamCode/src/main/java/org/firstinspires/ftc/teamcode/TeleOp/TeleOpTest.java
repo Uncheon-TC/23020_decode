@@ -133,7 +133,7 @@ public abstract class TeleOpTest extends OpMode {
             turret.trackPoint(position, goalX, goalY);
         }
 
-        if (gamepad1.a) {
+        if (gamepad1.right_trigger_pressed) {
             shooter.spinUp();
             if (gamepad1.b) {
                 shooter.fire();
