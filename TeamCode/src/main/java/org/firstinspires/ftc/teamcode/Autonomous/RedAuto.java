@@ -34,6 +34,9 @@ public class RedAuto extends OpMode {
         THIRD_FIRING,
         DRIVE_SEVENTH,
         DRIVE_TO_GATE_INTAKE,
+        WAIT_AT_GATE_INTAKE,
+        WAIT_FOR_FORTH_SHOT,
+
         FORTH_FIRING,
         DONE
     }
@@ -42,6 +45,8 @@ public class RedAuto extends OpMode {
     private static final double FIRST_SHOT_DELAY_SECONDS = 0.5;
     private static final double RETURN_SHOT_DELAY_SECONDS = 0.5;
     private static final double FIRING_TIME_SECONDS = 0.5;
+
+    private static final double INTAKING_TIME_SECONDS = 2;
 
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
 
@@ -52,19 +57,19 @@ public class RedAuto extends OpMode {
     private static final Pose FIRST_POSE = //shooting zone
             new Pose(96, 82, Math.toRadians(0));
     private static final Pose SECOND_POSE =
-            new Pose(120, 82, Math.toRadians(0));//grab artifact
+            new Pose(121, 82, Math.toRadians(0));//grab artifact
     //shoot
     private static final Pose THIRD_POSE =
-            new Pose(116.8, 62, Math.toRadians(0)); // grab artifact
+            new Pose(117, 62, Math.toRadians(0)); // grab artifact
     private static final Pose THIRD_CURVE =
             new Pose(92, 56, Math.toRadians(0));
     private static final Pose FORTH_POSE =
             new Pose(124, 65, Math.toRadians(0));
     private static final Pose FIFTH_POSE =
-            new Pose(123, 58, Math.toRadians(35));
+            new Pose(120, 60, Math.toRadians(45));
 // shoot
     private static final Pose SIXTH_POSE = // gate open
-            new Pose(130, 61, Math.toRadians(30));
+            new Pose(130, 62, Math.toRadians(30));
 
 
 
@@ -143,14 +148,14 @@ public class RedAuto extends OpMode {
                         FIFTH_POSE.getHeading(), SIXTH_POSE.getHeading())
                 .build();
 
-        /*
+
         eighthPath = follower.pathBuilder()
                 .addPath(new BezierLine(SIXTH_POSE, FIRST_POSE))
                 .setLinearHeadingInterpolation(
                         SIXTH_POSE.getHeading(), FIRST_POSE.getHeading())
                 .build();
 
-         */
+
 
 
         PoseStorage.clearAutoPose();
@@ -295,36 +300,52 @@ public class RedAuto extends OpMode {
 
             case DRIVE_SEVENTH:
                 shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
-                if (!follower.isBusy()) {
-                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                if (!follower.isBusy())  {
                     follower.followPath(returnPath);
                     autoState = AutoState.DRIVE_TO_GATE_INTAKE;
                 }
                 break;
 
             case DRIVE_TO_GATE_INTAKE:
-                artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
                 if (!follower.isBusy()) {
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
-                    autoState = AutoState.DONE;
+                    stateTimer.reset();
+                    autoState = AutoState.WAIT_AT_GATE_INTAKE;
                 }
                 break;
 
+            case WAIT_AT_GATE_INTAKE:
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                if (stateTimer.seconds() >= INTAKING_TIME_SECONDS) {
+                    follower.followPath(eighthPath);
+                    autoState = AutoState.WAIT_FOR_FORTH_SHOT;
+                }
+                break;
 
-            /*
-            case FORTH_FIRING:
+            case WAIT_FOR_FORTH_SHOT:
                 shooter.spinUp();
+                artifactIntake.setState(ArtifactIntake.State.IDLE);
+                if (!follower.isBusy()
+                        && shooter.getState() == Shooter.State.READY) {
+                    shooter.fire();
+                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+                    stateTimer.reset();
+                    autoState = AutoState.FORTH_FIRING;
+                }
+                break;
+
+            case FORTH_FIRING:
                 artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
+                if (!follower.isBusy() && stateTimer.seconds() >= FIRING_TIME_SECONDS) {
                     shooter.stop();
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
+                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(seventhPath);
                     autoState = AutoState.DRIVE_SEVENTH;
                 }
                 break;
-
-
 
 
             case DONE:
@@ -333,8 +354,6 @@ public class RedAuto extends OpMode {
                 artifactIntake.setState(ArtifactIntake.State.IDLE);
                 break;
 
-
-             */
         }
 
         shooter.update();
