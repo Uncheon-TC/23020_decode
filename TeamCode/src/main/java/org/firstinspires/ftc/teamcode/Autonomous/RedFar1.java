@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
@@ -14,41 +15,79 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ShotCalculator;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.Turret;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subConstant.AutoConst;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "Auto RED 2", group = "32020 AUTO")
-public class RedFar extends OpMode {
+@Autonomous(name = "Auto Red Far 30s", group = "32020 AUTO")
+public class RedFar1 extends OpMode {
     private enum AutoState {
         DRIVE_TO_FIRST_AND_SHOOT,
         DRIVE_TO_SECOND_INTAKE,
         RETURN_TO_FIRST,
         WAIT_FOR_RETURN_SHOT,
         FINAL_FIRING,
+        DRIVE_FOURTH_INTAKE,
+        DRIVE_FIFTH,
+        DRIVE_SIXTH_SPINUP,
+        WAIT_FOR_THIRD_SHOT,
+        THIRD_FIRING,
+        DRIVE_SEVENTH,
+        DRIVE_TO_GATE_INTAKE,
+        WAIT_AT_GATE_INTAKE,
+        WAIT_FOR_FORTH_SHOT,
+
+        FORTH_FIRING,
         DONE
     }
-
-    private static final Pose START_POSE =
-            new Pose(109, 133, Math.toRadians(90));
-    private static final Pose FIRST_POSE =
-            new Pose(109, 100, Math.toRadians(0));
-    private static final Pose SECOND_POSE =
-            new Pose(139, 100, Math.toRadians(0));
 
 
     private static final double FIRST_SHOT_DELAY_SECONDS = 0.5;
     private static final double RETURN_SHOT_DELAY_SECONDS = 0.5;
     private static final double FIRING_TIME_SECONDS = 0.5;
 
+    private static final double INTAKING_TIME_SECONDS = 2;
+
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
+
+    private final AutoConst autoConst = new AutoConst();
+
+    private static final Pose START_POSE =
+            new Pose(109, 133, Math.toRadians(90));
+    private static final Pose FIRST_POSE = //shooting zone
+            new Pose(96, 82, Math.toRadians(0));
+    private static final Pose SECOND_POSE =
+            new Pose(121, 82, Math.toRadians(0));//grab artifact
+    //shoot
+    private static final Pose THIRD_POSE =
+            new Pose(117, 62, Math.toRadians(0)); // grab artifact
+    private static final Pose THIRD_CURVE =
+            new Pose(92, 56, Math.toRadians(0));
+    private static final Pose FORTH_POSE =
+            new Pose(124, 65, Math.toRadians(0));
+    private static final Pose FIFTH_POSE =
+            new Pose(120, 60, Math.toRadians(45));
+    // shoot
+    private static final Pose SIXTH_POSE = // gate open
+            new Pose(130, 60, Math.toRadians(30));
+
+
+
+
     private final Shooter shooter = new Shooter();
     private final Turret turret = new Turret();
     private final ElapsedTime stateTimer = new ElapsedTime();
 
     private Follower follower;
-    private PathChain firstPath;
-    private PathChain secondPath;
-    private PathChain returnPath;
+    private PathChain firstPath,
+            secondPath,
+            thirdPath,
+            forthPath,
+            fifthPath,
+            sixthPath,
+            seventhPath,
+            eighthPath,
+            returnPath;
     private AutoState autoState = AutoState.DRIVE_TO_FIRST_AND_SHOOT;
     private ShotCalculator.ShotResult shotResult;
     private boolean firstShotStarted;
@@ -75,11 +114,49 @@ public class RedFar extends OpMode {
                         FIRST_POSE.getHeading(), SECOND_POSE.getHeading())
                 .build();
 
-        returnPath = follower.pathBuilder()
+        thirdPath = follower.pathBuilder()
                 .addPath(new BezierLine(SECOND_POSE, FIRST_POSE))
                 .setLinearHeadingInterpolation(
                         SECOND_POSE.getHeading(), FIRST_POSE.getHeading())
                 .build();
+
+        forthPath = follower.pathBuilder()
+                .addPath(new BezierCurve(FIRST_POSE, THIRD_CURVE, THIRD_POSE))
+                .setLinearHeadingInterpolation(
+                        FIRST_POSE.getHeading(), THIRD_POSE.getHeading())
+                .build();
+
+        fifthPath = follower.pathBuilder()
+                .addPath(new BezierLine(THIRD_POSE, FORTH_POSE))
+                .setLinearHeadingInterpolation(
+                        THIRD_POSE.getHeading(), FORTH_POSE.getHeading())
+                .build();
+        sixthPath = follower.pathBuilder()
+                .addPath(new BezierLine(FORTH_POSE, FIRST_POSE))
+                .setLinearHeadingInterpolation(
+                        FORTH_POSE.getHeading(), FIRST_POSE.getHeading())
+                .build();
+        seventhPath = follower.pathBuilder()
+                .addPath(new BezierLine(FIRST_POSE, FIFTH_POSE))
+                .setLinearHeadingInterpolation(
+                        FIRST_POSE.getHeading(), FIFTH_POSE.getHeading())
+                .build();
+
+        returnPath = follower.pathBuilder()
+                .addPath(new BezierLine(FIFTH_POSE, SIXTH_POSE))
+                .setLinearHeadingInterpolation(
+                        FIFTH_POSE.getHeading(), SIXTH_POSE.getHeading())
+                .build();
+
+
+        eighthPath = follower.pathBuilder()
+                .addPath(new BezierLine(SIXTH_POSE, FIRST_POSE))
+                .setLinearHeadingInterpolation(
+                        SIXTH_POSE.getHeading(), FIRST_POSE.getHeading())
+                .build();
+
+
+
 
         PoseStorage.clearAutoPose();
     }
@@ -136,7 +213,7 @@ public class RedFar extends OpMode {
                 if (!follower.isBusy()) {
                     artifactIntake.setState(ArtifactIntake.State.IDLE);
                     shooter.spinUp();
-                    follower.followPath(returnPath);
+                    follower.followPath(thirdPath);
                     autoState = AutoState.RETURN_TO_FIRST;
                 }
                 break;
@@ -166,16 +243,117 @@ public class RedFar extends OpMode {
                 artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
                 if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
                     shooter.stop();
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
-                    autoState = AutoState.DONE;
+                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                    follower.followPath(forthPath);
+                    autoState = AutoState.DRIVE_FOURTH_INTAKE;
                 }
                 break;
+
+            case DRIVE_FOURTH_INTAKE:
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                if (!follower.isBusy()) {
+                    artifactIntake.setState(ArtifactIntake.State.IDLE);
+                    follower.followPath(fifthPath);
+                    autoState = AutoState.DRIVE_FIFTH;
+                }
+                break;
+
+            case DRIVE_FIFTH:
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.IDLE);
+                if (!follower.isBusy()) {
+                    shooter.spinUp();
+                    follower.followPath(sixthPath);
+                    autoState = AutoState.DRIVE_SIXTH_SPINUP;
+                }
+                break;
+
+            case DRIVE_SIXTH_SPINUP:
+                shooter.spinUp();
+                artifactIntake.setState(ArtifactIntake.State.IDLE);
+                if (!follower.isBusy()) {
+                    autoState = AutoState.WAIT_FOR_THIRD_SHOT;
+                }
+                break;
+
+            case WAIT_FOR_THIRD_SHOT:
+                shooter.spinUp();
+                artifactIntake.setState(ArtifactIntake.State.IDLE);
+                if (shooter.getState() == Shooter.State.READY) {
+                    shooter.fire();
+                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+                    stateTimer.reset();
+                    autoState = AutoState.THIRD_FIRING;
+                }
+                break;
+
+            case THIRD_FIRING:
+                artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+                if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
+                    shooter.stop();
+                    artifactIntake.setState(ArtifactIntake.State.IDLE);
+                    follower.followPath(seventhPath);
+                    autoState = AutoState.DRIVE_SEVENTH;
+                }
+                break;
+
+            case DRIVE_SEVENTH:
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                if (!follower.isBusy())  {
+                    follower.followPath(returnPath);
+                    autoState = AutoState.DRIVE_TO_GATE_INTAKE;
+                }
+                break;
+
+            case DRIVE_TO_GATE_INTAKE:
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                if (!follower.isBusy()) {
+                    stateTimer.reset();
+                    autoState = AutoState.WAIT_AT_GATE_INTAKE;
+                }
+                break;
+
+            case WAIT_AT_GATE_INTAKE:
+                shooter.stop();
+                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                if (stateTimer.seconds() >= INTAKING_TIME_SECONDS) {
+                    follower.followPath(eighthPath);
+                    autoState = AutoState.WAIT_FOR_FORTH_SHOT;
+                }
+                break;
+
+            case WAIT_FOR_FORTH_SHOT:
+                shooter.spinUp();
+                artifactIntake.setState(ArtifactIntake.State.IDLE);
+                if (!follower.isBusy()
+                        && shooter.getState() == Shooter.State.READY) {
+                    shooter.fire();
+                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+                    stateTimer.reset();
+                    autoState = AutoState.FORTH_FIRING;
+                }
+                break;
+
+            case FORTH_FIRING:
+                artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+                if (!follower.isBusy() && stateTimer.seconds() >= FIRING_TIME_SECONDS) {
+                    shooter.stop();
+                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                    follower.followPath(seventhPath);
+                    autoState = AutoState.DRIVE_SEVENTH;
+                }
+                break;
+
 
             case DONE:
             default:
                 shooter.stop();
                 artifactIntake.setState(ArtifactIntake.State.IDLE);
                 break;
+
         }
 
         shooter.update();

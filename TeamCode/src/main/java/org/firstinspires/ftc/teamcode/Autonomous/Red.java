@@ -15,12 +15,12 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ShotCalculator;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.Turret;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subConstant.AutoRedFarConst;
+import org.firstinspires.ftc.teamcode.subConstant.AutoConst;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "Auto RED 1", group = "32020 AUTO")
-public class RedAuto extends OpMode {
+@Autonomous(name = "RedFar 30s", group = "32020 AUTO")
+public class Red extends OpMode {
     private enum AutoState {
         DRIVE_TO_FIRST_AND_SHOOT,
         DRIVE_TO_SECOND_INTAKE,
@@ -50,7 +50,8 @@ public class RedAuto extends OpMode {
 
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
 
-    private final AutoRedFarConst autoConst = new AutoRedFarConst();
+    private final AutoConst autoConst = new AutoConst();
+
 
     private static final Pose START_POSE =
             new Pose(109, 133, Math.toRadians(90));
@@ -67,12 +68,9 @@ public class RedAuto extends OpMode {
             new Pose(124, 65, Math.toRadians(0));
     private static final Pose FIFTH_POSE =
             new Pose(120, 60, Math.toRadians(45));
-// shoot
+    // shoot
     private static final Pose SIXTH_POSE = // gate open
             new Pose(130, 60, Math.toRadians(30));
-
-
-
 
     private final Shooter shooter = new Shooter();
     private final Turret turret = new Turret();
