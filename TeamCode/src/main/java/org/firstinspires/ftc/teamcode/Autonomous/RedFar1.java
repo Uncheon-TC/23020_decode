@@ -69,7 +69,7 @@ public class RedFar1 extends OpMode {
             new Pose(120, 60, Math.toRadians(45));
     // shoot
     private static final Pose SIXTH_POSE = // gate open
-            new Pose(130, 60, Math.toRadians(30));
+            new Pose(130, 60, Math.toRadians(25));
 
 
 
