@@ -20,9 +20,13 @@ import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
 @Autonomous(name = "AutoRedFar 60s", group = "32020 AUTO")
 public class RedFar1 extends OpMode {
+<<<<<<< HEAD
     private enum AutoState {
 
         SHOOT_AT_FIRST,
+=======
+        private enum AutoState {
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
         DRIVE_TO_FIRST,
         DRIVE_TO_SECOND,
         SHOOT_AT_SECOND,
@@ -31,6 +35,7 @@ public class RedFar1 extends OpMode {
         SHOOT_AT_FOURTH,
         DRIVE_TO_FIFTH,
         DRIVE_TO_SIXTH,
+<<<<<<< HEAD
         SHOOT_AT_SIXTH,
         DRIVE_TO_SEVENTH,
         DRIVE_TO_EIGHTH,
@@ -47,6 +52,22 @@ public class RedFar1 extends OpMode {
     private static final Pose SIXTH_POSE = new Pose(96, 15, Math.toRadians(0));
     private static final Pose SEVENTH_POSE   = new Pose(130, 42, Math.toRadians(30));
     private static final Pose EIGHTH_POSE = new Pose(96, 15, Math.toRadians(0));
+=======
+        DRIVE_TO_SEVENTH,
+        SHOOT_AT_SEVENTH,
+    }
+
+    private static final Pose START_POSE   = new Pose(95, 9.7, Math.toRadians(90));
+    private static final Pose FIRST_POSE   = new Pose(130, 9.7, Math.toRadians(0));
+    private static final Pose SECOND_POSE  = new Pose(95, 9.7, Math.toRadians(0));
+    private static final Pose SECOND_CURVE = new Pose(101, 38, Math.toRadians(0));
+    private static final Pose THIRD_POSE   = new Pose(126, 34, Math.toRadians(0));
+    private static final Pose FOURTH_POSE  = new Pose(95, 9.7, Math.toRadians(0));
+    private static final Pose FIFTH_POSE   = new Pose(130, 9.7, Math.toRadians(0));
+    private static final Pose SIXTH_POSE   = new Pose(130, 42, Math.toRadians(30));
+    private static final Pose SEVENTH_POSE = new Pose(95, 9.7, Math.toRadians(0)); // same coords as FOURTH_POSE
+
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
     private static final double SHOT_DELAY_SECONDS  = 0.5;
     private static final double FIRING_TIME_SECONDS = 0.5;
 
@@ -56,7 +77,11 @@ public class RedFar1 extends OpMode {
     private final ElapsedTime stateTimer = new ElapsedTime();
 
     private Follower follower;
+<<<<<<< HEAD
     private PathChain firstPath, secondPath, thirdPath, fourthPath, fifthPath, sixthPath, seventhPath, eighthPath;
+=======
+    private PathChain firstPath, secondPath, thirdPath, fourthPath, fifthPath, sixthPath, seventhPath;
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
     private AutoState autoState = AutoState.DRIVE_TO_FIRST;
     private ShotCalculator.ShotResult shotResult;
 
@@ -105,10 +130,13 @@ public class RedFar1 extends OpMode {
         seventhPath = follower.pathBuilder()
                 .addPath(new BezierLine(SIXTH_POSE, SEVENTH_POSE))
                 .setLinearHeadingInterpolation(SIXTH_POSE.getHeading(), SEVENTH_POSE.getHeading())
+<<<<<<< HEAD
                 .build();
         eighthPath = follower.pathBuilder()
                 .addPath(new BezierLine(SEVENTH_POSE, EIGHTH_POSE))
                 .setLinearHeadingInterpolation(SEVENTH_POSE.getHeading(), EIGHTH_POSE.getHeading())
+=======
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
                 .build();
 
         PoseStorage.clearAutoPose();
@@ -121,7 +149,11 @@ public class RedFar1 extends OpMode {
 
         artifactIntake.setState(ArtifactIntake.State.INTAKING);
         follower.followPath(firstPath);
+<<<<<<< HEAD
         autoState = AutoState.SHOOT_AT_FIRST;
+=======
+        autoState = AutoState.DRIVE_TO_FIRST;
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
     }
 
     @Override
@@ -131,6 +163,7 @@ public class RedFar1 extends OpMode {
 
         switch (autoState) {
 
+<<<<<<< HEAD
             case SHOOT_AT_FIRST:
                 shooter.spinUp();
                 beginShotSequence();
@@ -138,6 +171,8 @@ public class RedFar1 extends OpMode {
                     autoState = AutoState.DRIVE_TO_FIRST;
                 }
 
+=======
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
             case DRIVE_TO_FIRST:
                 if (!follower.isBusy()) {
                     follower.followPath(secondPath);
@@ -162,6 +197,7 @@ public class RedFar1 extends OpMode {
                 break;
 
             case DRIVE_TO_THIRD:
+<<<<<<< HEAD
                 if (!follower.isBusy()) {
                     follower.followPath(fourthPath);
                     shooter.spinUp();
@@ -192,8 +228,12 @@ public class RedFar1 extends OpMode {
                 break;
 
             case DRIVE_TO_SIXTH:
+=======
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
                 if (!follower.isBusy()) {
+                    follower.followPath(fourthPath);
                     shooter.spinUp();
+<<<<<<< HEAD
                     beginShotSequence();
                     autoState = AutoState.SHOOT_AT_SIXTH;
                 }
@@ -224,6 +264,53 @@ public class RedFar1 extends OpMode {
             case SHOOT_AT_EIGHTH:
                 if (updateShotSequence()) {
                     // repeat
+=======
+                    autoState = AutoState.DRIVE_TO_FOURTH;
+                }
+                break;
+
+            case DRIVE_TO_FOURTH:
+                if (!follower.isBusy()) {
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_FOURTH;
+                }
+                break;
+
+            case SHOOT_AT_FOURTH:
+                if (updateShotSequence()) {
+                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                    follower.followPath(fifthPath);
+                    autoState = AutoState.DRIVE_TO_FIFTH;
+                }
+                break;
+
+            case DRIVE_TO_FIFTH:
+                if (!follower.isBusy()) {
+                    follower.followPath(sixthPath);
+                    autoState = AutoState.DRIVE_TO_SIXTH;
+                }
+                break;
+
+            case DRIVE_TO_SIXTH:
+                if (!follower.isBusy()) {
+                    follower.followPath(seventhPath);
+                    shooter.spinUp();
+                    autoState = AutoState.DRIVE_TO_SEVENTH;
+                }
+                break;
+
+            case DRIVE_TO_SEVENTH:
+                if (!follower.isBusy()) {
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_SEVENTH;
+                }
+                break;
+
+            case SHOOT_AT_SEVENTH:
+                if (updateShotSequence()) {
+                    // SEVENTH_POSE == FOURTH_POSE, so heading back down
+                    // fifthPath repeats steps 5 -> 6 -> 7 for the next cycle.
+>>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(fifthPath);
                     autoState = AutoState.DRIVE_TO_FIFTH;
