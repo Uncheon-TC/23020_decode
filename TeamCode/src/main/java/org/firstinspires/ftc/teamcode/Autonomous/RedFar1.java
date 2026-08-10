@@ -15,83 +15,53 @@ import org.firstinspires.ftc.teamcode.Mechanisms.ShotCalculator;
 import org.firstinspires.ftc.teamcode.Mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.Mechanisms.Turret;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subConstant.AutoConst;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "Auto Red Far 30s", group = "32020 AUTO")
+@Autonomous(name = "AutoRedFar 60s", group = "32020 AUTO")
 public class RedFar1 extends OpMode {
     private enum AutoState {
-        DRIVE_TO_FIRST_AND_SHOOT,
-        DRIVE_TO_SECOND_INTAKE,
-        RETURN_TO_FIRST,
-        WAIT_FOR_RETURN_SHOT,
-        FINAL_FIRING,
-        DRIVE_FOURTH_INTAKE,
-        DRIVE_FIFTH,
-        DRIVE_SIXTH_SPINUP,
-        WAIT_FOR_THIRD_SHOT,
-        THIRD_FIRING,
-        DRIVE_SEVENTH,
-        DRIVE_TO_GATE_INTAKE,
-        WAIT_AT_GATE_INTAKE,
-        WAIT_FOR_FORTH_SHOT,
 
-        FORTH_FIRING,
-        DONE
+        SHOOT_AT_FIRST,
+        DRIVE_TO_FIRST,
+        DRIVE_TO_SECOND,
+        SHOOT_AT_SECOND,
+        DRIVE_TO_THIRD,
+        DRIVE_TO_FOURTH,
+        SHOOT_AT_FOURTH,
+        DRIVE_TO_FIFTH,
+        DRIVE_TO_SIXTH,
+        SHOOT_AT_SIXTH,
+        DRIVE_TO_SEVENTH,
+        DRIVE_TO_EIGHTH,
+        SHOOT_AT_EIGHTH,
     }
 
-
-    private static final double FIRST_SHOT_DELAY_SECONDS = 0.5;
-    private static final double RETURN_SHOT_DELAY_SECONDS = 0.5;
+    private static final Pose START_POSE   = new Pose(96, 9, Math.toRadians(0));
+    private static final Pose FIRST_POSE   = new Pose(130, 9.7, Math.toRadians(0));
+    private static final Pose SECOND_POSE  = new Pose(96, 9, Math.toRadians(0));
+    private static final Pose SECOND_CURVE = new Pose(101, 38, Math.toRadians(0));
+    private static final Pose THIRD_POSE   = new Pose(126, 34, Math.toRadians(0));
+    private static final Pose FOURTH_POSE  = new Pose(96, 15, Math.toRadians(0));
+    private static final Pose FIFTH_POSE   = new Pose(130, 9.7, Math.toRadians(0));
+    private static final Pose SIXTH_POSE = new Pose(96, 15, Math.toRadians(0));
+    private static final Pose SEVENTH_POSE   = new Pose(130, 42, Math.toRadians(30));
+    private static final Pose EIGHTH_POSE = new Pose(96, 15, Math.toRadians(0));
+    private static final double SHOT_DELAY_SECONDS  = 0.5;
     private static final double FIRING_TIME_SECONDS = 0.5;
 
-    private static final double INTAKING_TIME_SECONDS = 2;
-
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
-
-    private final AutoConst autoConst = new AutoConst();
-
-    private static final Pose START_POSE =
-            new Pose(109, 133, Math.toRadians(90));
-    private static final Pose FIRST_POSE = //shooting zone
-            new Pose(96, 82, Math.toRadians(0));
-    private static final Pose SECOND_POSE =
-            new Pose(121, 82, Math.toRadians(0));//grab artifact
-    //shoot
-    private static final Pose THIRD_POSE =
-            new Pose(117, 62, Math.toRadians(0)); // grab artifact
-    private static final Pose THIRD_CURVE =
-            new Pose(92, 56, Math.toRadians(0));
-    private static final Pose FORTH_POSE =
-            new Pose(124, 65, Math.toRadians(0));
-    private static final Pose FIFTH_POSE =
-            new Pose(120, 60, Math.toRadians(45));
-    // shoot
-    private static final Pose SIXTH_POSE = // gate open
-            new Pose(130, 60, Math.toRadians(25));
-
-
-
-
     private final Shooter shooter = new Shooter();
     private final Turret turret = new Turret();
     private final ElapsedTime stateTimer = new ElapsedTime();
 
     private Follower follower;
-    private PathChain firstPath,
-            secondPath,
-            thirdPath,
-            forthPath,
-            fifthPath,
-            sixthPath,
-            seventhPath,
-            eighthPath,
-            returnPath;
-    private AutoState autoState = AutoState.DRIVE_TO_FIRST_AND_SHOOT;
+    private PathChain firstPath, secondPath, thirdPath, fourthPath, fifthPath, sixthPath, seventhPath, eighthPath;
+    private AutoState autoState = AutoState.DRIVE_TO_FIRST;
     private ShotCalculator.ShotResult shotResult;
-    private boolean firstShotStarted;
-    private boolean firstShotComplete;
+
+    // sub-state shared by every SHOOT_AT_* state
+    private boolean shotStarted, shotCompleted;
 
     @Override
     public void init() {
@@ -104,59 +74,42 @@ public class RedFar1 extends OpMode {
 
         firstPath = follower.pathBuilder()
                 .addPath(new BezierLine(START_POSE, FIRST_POSE))
-                .setLinearHeadingInterpolation(
-                        START_POSE.getHeading(), FIRST_POSE.getHeading())
+                .setLinearHeadingInterpolation(START_POSE.getHeading(), FIRST_POSE.getHeading())
                 .build();
 
         secondPath = follower.pathBuilder()
                 .addPath(new BezierLine(FIRST_POSE, SECOND_POSE))
-                .setLinearHeadingInterpolation(
-                        FIRST_POSE.getHeading(), SECOND_POSE.getHeading())
+                .setConstantHeadingInterpolation(SECOND_POSE.getHeading())
                 .build();
 
         thirdPath = follower.pathBuilder()
-                .addPath(new BezierLine(SECOND_POSE, FIRST_POSE))
-                .setLinearHeadingInterpolation(
-                        SECOND_POSE.getHeading(), FIRST_POSE.getHeading())
+                .addPath(new BezierCurve(SECOND_POSE, SECOND_CURVE, THIRD_POSE))
+                .setConstantHeadingInterpolation(THIRD_POSE.getHeading())
                 .build();
 
-        forthPath = follower.pathBuilder()
-                .addPath(new BezierCurve(FIRST_POSE, THIRD_CURVE, THIRD_POSE))
-                .setLinearHeadingInterpolation(
-                        FIRST_POSE.getHeading(), THIRD_POSE.getHeading())
+        fourthPath = follower.pathBuilder()
+                .addPath(new BezierLine(THIRD_POSE, FOURTH_POSE))
+                .setConstantHeadingInterpolation(FOURTH_POSE.getHeading())
                 .build();
 
         fifthPath = follower.pathBuilder()
-                .addPath(new BezierLine(THIRD_POSE, FORTH_POSE))
-                .setLinearHeadingInterpolation(
-                        THIRD_POSE.getHeading(), FORTH_POSE.getHeading())
+                .addPath(new BezierLine(FOURTH_POSE, FIFTH_POSE))
+                .setLinearHeadingInterpolation(FOURTH_POSE.getHeading(), FIFTH_POSE.getHeading())
                 .build();
+
         sixthPath = follower.pathBuilder()
-                .addPath(new BezierLine(FORTH_POSE, FIRST_POSE))
-                .setLinearHeadingInterpolation(
-                        FORTH_POSE.getHeading(), FIRST_POSE.getHeading())
-                .build();
-        seventhPath = follower.pathBuilder()
-                .addPath(new BezierLine(FIRST_POSE, FIFTH_POSE))
-                .setLinearHeadingInterpolation(
-                        FIRST_POSE.getHeading(), FIFTH_POSE.getHeading())
-                .build();
-
-        returnPath = follower.pathBuilder()
                 .addPath(new BezierLine(FIFTH_POSE, SIXTH_POSE))
-                .setLinearHeadingInterpolation(
-                        FIFTH_POSE.getHeading(), SIXTH_POSE.getHeading())
+                .setLinearHeadingInterpolation(FIFTH_POSE.getHeading(), SIXTH_POSE.getHeading())
                 .build();
 
-
+        seventhPath = follower.pathBuilder()
+                .addPath(new BezierLine(SIXTH_POSE, SEVENTH_POSE))
+                .setLinearHeadingInterpolation(SIXTH_POSE.getHeading(), SEVENTH_POSE.getHeading())
+                .build();
         eighthPath = follower.pathBuilder()
-                .addPath(new BezierLine(SIXTH_POSE, FIRST_POSE))
-                .setLinearHeadingInterpolation(
-                        SIXTH_POSE.getHeading(), FIRST_POSE.getHeading())
+                .addPath(new BezierLine(SEVENTH_POSE, EIGHTH_POSE))
+                .setLinearHeadingInterpolation(SEVENTH_POSE.getHeading(), EIGHTH_POSE.getHeading())
                 .build();
-
-
-
 
         PoseStorage.clearAutoPose();
     }
@@ -164,12 +117,11 @@ public class RedFar1 extends OpMode {
     @Override
     public void start() {
         follower.setPose(START_POSE);
-        shooter.spinUp();
-        firstShotStarted = false;
-        firstShotComplete = false;
         stateTimer.reset();
+
+        artifactIntake.setState(ArtifactIntake.State.INTAKING);
         follower.followPath(firstPath);
-        autoState = AutoState.DRIVE_TO_FIRST_AND_SHOOT;
+        autoState = AutoState.SHOOT_AT_FIRST;
     }
 
     @Override
@@ -178,182 +130,105 @@ public class RedFar1 extends OpMode {
         updateAutomaticAim();
 
         switch (autoState) {
-            case DRIVE_TO_FIRST_AND_SHOOT:
+
+            case SHOOT_AT_FIRST:
                 shooter.spinUp();
-
-                if (!firstShotStarted
-                        && stateTimer.seconds() >= FIRST_SHOT_DELAY_SECONDS
-                        && shooter.getState() == Shooter.State.READY) {
-                    shooter.fire();
-                    stateTimer.reset();
-                    firstShotStarted = true;
+                beginShotSequence();
+                if(updateShotSequence()){
+                    autoState = AutoState.DRIVE_TO_FIRST;
                 }
 
-                if (firstShotStarted && !firstShotComplete) {
-                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                    if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
-                        firstShotComplete = true;
-                        artifactIntake.setState(ArtifactIntake.State.IDLE);
-                    }
-                } else {
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
-                }
-
-                if (firstShotComplete && !follower.isBusy()) {
-                    shooter.stop();
-                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
+            case DRIVE_TO_FIRST:
+                if (!follower.isBusy()) {
                     follower.followPath(secondPath);
-                    autoState = AutoState.DRIVE_TO_SECOND_INTAKE;
+                    shooter.spinUp();
+                    autoState = AutoState.DRIVE_TO_SECOND;
                 }
                 break;
 
-            case DRIVE_TO_SECOND_INTAKE:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.INTAKING);
+            case DRIVE_TO_SECOND:
                 if (!follower.isBusy()) {
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
-                    shooter.spinUp();
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_SECOND;
+                }
+                break;
+
+            case SHOOT_AT_SECOND:
+                if (updateShotSequence()) {
+                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(thirdPath);
-                    autoState = AutoState.RETURN_TO_FIRST;
+                    autoState = AutoState.DRIVE_TO_THIRD;
                 }
                 break;
 
-            case RETURN_TO_FIRST:
-                shooter.spinUp();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
+            case DRIVE_TO_THIRD:
                 if (!follower.isBusy()) {
-                    stateTimer.reset();
-                    autoState = AutoState.WAIT_FOR_RETURN_SHOT;
+                    follower.followPath(fourthPath);
+                    shooter.spinUp();
+                    autoState = AutoState.DRIVE_TO_FOURTH;
                 }
                 break;
 
-            case WAIT_FOR_RETURN_SHOT:
-                shooter.spinUp();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
-                if (stateTimer.seconds() >= RETURN_SHOT_DELAY_SECONDS
-                        && shooter.getState() == Shooter.State.READY) {
-                    shooter.fire();
-                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                    stateTimer.reset();
-                    autoState = AutoState.FINAL_FIRING;
+            case DRIVE_TO_FOURTH:
+                if (!follower.isBusy()) {
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_FOURTH;
                 }
                 break;
 
-            case FINAL_FIRING:
-                artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
-                    shooter.stop();
+            case SHOOT_AT_FOURTH:
+                if (updateShotSequence()) {
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                    follower.followPath(forthPath);
-                    autoState = AutoState.DRIVE_FOURTH_INTAKE;
-                }
-                break;
-
-            case DRIVE_FOURTH_INTAKE:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                if (!follower.isBusy()) {
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
                     follower.followPath(fifthPath);
-                    autoState = AutoState.DRIVE_FIFTH;
+                    autoState = AutoState.DRIVE_TO_FIFTH;
                 }
                 break;
 
-            case DRIVE_FIFTH:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
+            case DRIVE_TO_FIFTH:
+                if (!follower.isBusy()) {
+                    follower.followPath(sixthPath);
+                    autoState = AutoState.DRIVE_TO_SIXTH;
+                }
+                break;
+
+            case DRIVE_TO_SIXTH:
                 if (!follower.isBusy()) {
                     shooter.spinUp();
-                    follower.followPath(sixthPath);
-                    autoState = AutoState.DRIVE_SIXTH_SPINUP;
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_SIXTH;
                 }
                 break;
 
-            case DRIVE_SIXTH_SPINUP:
-                shooter.spinUp();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
-                if (!follower.isBusy()) {
-                    autoState = AutoState.WAIT_FOR_THIRD_SHOT;
-                }
-                break;
-
-            case WAIT_FOR_THIRD_SHOT:
-                shooter.spinUp();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
-                if (shooter.getState() == Shooter.State.READY) {
-                    shooter.fire();
-                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                    stateTimer.reset();
-                    autoState = AutoState.THIRD_FIRING;
-                }
-                break;
-
-            case THIRD_FIRING:
-                artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
-                    shooter.stop();
-                    artifactIntake.setState(ArtifactIntake.State.IDLE);
-                    follower.followPath(seventhPath);
-                    autoState = AutoState.DRIVE_SEVENTH;
-                }
-                break;
-
-            case DRIVE_SEVENTH:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                if (!follower.isBusy())  {
-                    follower.followPath(returnPath);
-                    autoState = AutoState.DRIVE_TO_GATE_INTAKE;
-                }
-                break;
-
-            case DRIVE_TO_GATE_INTAKE:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                if (!follower.isBusy()) {
-                    stateTimer.reset();
-                    autoState = AutoState.WAIT_AT_GATE_INTAKE;
-                }
-                break;
-
-            case WAIT_AT_GATE_INTAKE:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                if (stateTimer.seconds() >= INTAKING_TIME_SECONDS) {
-                    follower.followPath(eighthPath);
-                    autoState = AutoState.WAIT_FOR_FORTH_SHOT;
-                }
-                break;
-
-            case WAIT_FOR_FORTH_SHOT:
-                shooter.spinUp();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
-                if (!follower.isBusy()
-                        && shooter.getState() == Shooter.State.READY) {
-                    shooter.fire();
-                    artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                    stateTimer.reset();
-                    autoState = AutoState.FORTH_FIRING;
-                }
-                break;
-
-            case FORTH_FIRING:
-                artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
-                if (!follower.isBusy() && stateTimer.seconds() >= FIRING_TIME_SECONDS) {
-                    shooter.stop();
+            case SHOOT_AT_SIXTH:
+                if (updateShotSequence()) {
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(seventhPath);
-                    autoState = AutoState.DRIVE_SEVENTH;
+                    autoState = AutoState.DRIVE_TO_SEVENTH;
                 }
                 break;
 
-
-            case DONE:
-            default:
-                shooter.stop();
-                artifactIntake.setState(ArtifactIntake.State.IDLE);
+            case DRIVE_TO_SEVENTH:
+                if (!follower.isBusy()) {
+                    follower.followPath(eighthPath);
+                    shooter.spinUp();
+                    autoState = AutoState.DRIVE_TO_EIGHTH;
+                }
                 break;
 
+            case DRIVE_TO_EIGHTH:
+                if (!follower.isBusy()) {
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_EIGHTH;
+                }
+
+            case SHOOT_AT_EIGHTH:
+                if (updateShotSequence()) {
+                    // repeat
+                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
+                    follower.followPath(fifthPath);
+                    autoState = AutoState.DRIVE_TO_FIFTH;
+                }
+                break;
         }
 
         shooter.update();
@@ -372,6 +247,34 @@ public class RedFar1 extends OpMode {
         turret.stop();
     }
 
+
+    private void beginShotSequence() {
+        stateTimer.reset();
+        shotStarted = false;
+        shotCompleted = false;
+    }
+
+    private boolean updateShotSequence() {
+        if (!shotStarted
+                && stateTimer.seconds() >= SHOT_DELAY_SECONDS
+                && shooter.getState() == Shooter.State.READY) {
+            shooter.fire();
+            stateTimer.reset();
+            shotStarted = true;
+        }
+
+        if (shotStarted && !shotCompleted) {
+            artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
+            if (stateTimer.seconds() >= FIRING_TIME_SECONDS) {
+                shotCompleted = true;
+                artifactIntake.setState(ArtifactIntake.State.IDLE);
+                shooter.stop();
+            }
+        }
+
+        return shotCompleted;
+    }
+
     private void updateAutomaticAim() {
         Pose pose = follower.getPose();
         Vector velocity = follower.getVelocity();
@@ -384,16 +287,9 @@ public class RedFar1 extends OpMode {
                 velocity.getYComponent());
 
         if (shotResult != null) {
-            turret.trackPoint(
-                    pose,
-                    ShooterConst.RED_GOAL_X,
-                    ShooterConst.RED_GOAL_Y,
-                    shotResult.turretOffset);
+            turret.trackPoint(pose, ShooterConst.RED_GOAL_X, ShooterConst.RED_GOAL_Y, shotResult.turretOffset);
         } else {
-            turret.trackPoint(
-                    pose,
-                    ShooterConst.RED_GOAL_X,
-                    ShooterConst.RED_GOAL_Y);
+            turret.trackPoint(pose, ShooterConst.RED_GOAL_X, ShooterConst.RED_GOAL_Y);
         }
     }
 

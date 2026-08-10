@@ -48,7 +48,7 @@ public class ArtifactIntake {
                 setPower(0.7, 0.3, 0.5);
                 break;
             case OUTTAKING:
-                setPower(1, 1, 0.0);
+                setPower(1, 1, 0.1);
                 break;
             case IDLE:
             default:

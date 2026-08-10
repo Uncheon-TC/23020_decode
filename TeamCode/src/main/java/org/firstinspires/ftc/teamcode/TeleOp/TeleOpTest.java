@@ -125,6 +125,14 @@ public abstract class TeleOpTest extends OpMode {
                 robotVelocityX,
                 robotVelocityY);
 
+
+        if(gamepad2.dpadUpWasPressed()){
+            ShooterConst.SHOOTER_POWER_RATIO_MAX += 0.1;
+        }else if(gamepad2.dpadDownWasPressed()){
+            ShooterConst.SHOOTER_POWER_RATIO_MAX -= 0.1;
+        }
+
+
         // 주행 중에도 현재 위치와 헤딩을 기준으로 골대를 계속 추적한다.
         // ShotCalculator의 보정각을 적용해 로봇의 이동 속도까지 반영한다.
         if (shotResult != null) {
@@ -143,6 +151,7 @@ public abstract class TeleOpTest extends OpMode {
         }
         shooter.update();
 
+
         if (position != null) {
             telemetry.addData("Heading (Degrees)", Math.toDegrees(position.getHeading()));
             telemetry.addData("Heading (Radians)", position.getHeading());
@@ -151,6 +160,7 @@ public abstract class TeleOpTest extends OpMode {
             telemetry.addData("velocityX", robotVelocityX);
             telemetry.addData("velocityY", robotVelocityY);
         }
+        telemetry.addData("Shooter Power Ratio Max", ShooterConst.SHOOTER_POWER_RATIO_MAX);
         telemetry.addData("curVelo", shooter.ShooterLeft.getVelocity());
         telemetry.addData("targetVelo", shooter.getTargetVelocity());
         telemetry.addData("shooterPowerRatio", shooter.getAppliedPowerRatio());

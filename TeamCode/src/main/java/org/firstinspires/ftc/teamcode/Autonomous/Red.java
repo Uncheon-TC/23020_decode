@@ -46,7 +46,7 @@ public class Red extends OpMode {
     private static final double RETURN_SHOT_DELAY_SECONDS = 0.5;
     private static final double FIRING_TIME_SECONDS = 0.5;
 
-    private static final double INTAKING_TIME_SECONDS = 2;
+    private static final double INTAKING_TIME_SECONDS = 1.5;
 
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
 
@@ -55,19 +55,19 @@ public class Red extends OpMode {
 
     private static final Pose START_POSE =
             new Pose(109, 133, Math.toRadians(90));
-    private static final Pose FIRST_POSE = //shooting zone
+    private static final Pose FIRST_POSE = // 슈팅위치
             new Pose(96, 82, Math.toRadians(0));
     private static final Pose SECOND_POSE =
-            new Pose(121, 82, Math.toRadians(0));//grab artifact
+            new Pose(121, 82, Math.toRadians(0)); // 첫번째 줄 유물 먹는 위치
     //shoot
     private static final Pose THIRD_POSE =
-            new Pose(117, 62, Math.toRadians(0)); // grab artifact
+            new Pose(117, 62, Math.toRadians(0)); // 두번째 줄 유물 먹는 위치
     private static final Pose THIRD_CURVE =
-            new Pose(92, 56, Math.toRadians(0));
+            new Pose(92, 56, Math.toRadians(0)); // 두번째 줄 유물 먹으러 가는 커브 체크포인트
     private static final Pose FORTH_POSE =
-            new Pose(124, 65, Math.toRadians(0));
+            new Pose(124, 65, Math.toRadians(0)); // 첫번째 게이트 오픈 위치
     private static final Pose FIFTH_POSE =
-            new Pose(120, 60, Math.toRadians(45));
+            new Pose(120, 60, Math.toRadians(45)); //
     // shoot
     private static final Pose SIXTH_POSE = // gate open
             new Pose(130, 60, Math.toRadians(30));
