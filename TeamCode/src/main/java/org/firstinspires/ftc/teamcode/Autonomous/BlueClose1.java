@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.subConstant.AutoConst;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "AutoRedClose1 30s", group = "32020 AUTO")
-public class RedClose1 extends OpMode {
+@Autonomous(name = "AutoRedFar1 30s", group = "32020 AUTO")
+public class BlueClose1 extends OpMode {
     private enum AutoState {
         DRIVE_TO_FIRST_AND_SHOOT,
         DRIVE_TO_SECOND_INTAKE,
@@ -53,23 +53,30 @@ public class RedClose1 extends OpMode {
     private final AutoConst autoConst = new AutoConst();
 
     private static final Pose START_POSE =
-            new Pose(109, 133, Math.toRadians(90));
-    private static final Pose FIRST_POSE = //shooting zone
-            new Pose(96, 82, Math.toRadians(0));
+            new Pose(35, 133, Math.toRadians(90));
+
+    private static final Pose FIRST_POSE = // shooting zone
+            new Pose(48, 82, Math.toRadians(180));
+
     private static final Pose SECOND_POSE =
-            new Pose(121, 82, Math.toRadians(0));//grab artifact
-    //shoot
+            new Pose(23, 82, Math.toRadians(180)); // grab artifact
+
+    // shoot
     private static final Pose THIRD_POSE =
-            new Pose(117, 62, Math.toRadians(0)); // grab artifact
+            new Pose(27, 62, Math.toRadians(180)); // grab artifact
+
     private static final Pose THIRD_CURVE =
-            new Pose(92, 56, Math.toRadians(0));
+            new Pose(52, 56, Math.toRadians(180));
+
     private static final Pose FORTH_POSE =
-            new Pose(124, 65, Math.toRadians(0));
+            new Pose(20, 65, Math.toRadians(180));
+
     private static final Pose FIFTH_POSE =
-            new Pose(120, 60, Math.toRadians(45));
+            new Pose(24, 60, Math.toRadians(135));
+
     // shoot
     private static final Pose SIXTH_POSE = // gate open
-            new Pose(130, 60, Math.toRadians(25));
+            new Pose(14, 60, Math.toRadians(155));
 
 
 
