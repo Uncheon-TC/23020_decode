@@ -20,54 +20,48 @@ import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
 @Autonomous(name = "AutoRedFar 60s", group = "32020 AUTO")
 public class RedFar1 extends OpMode {
-<<<<<<< HEAD
     private enum AutoState {
+        SHOOT_PRELOAD,
 
-        SHOOT_AT_FIRST,
-=======
-        private enum AutoState {
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
-        DRIVE_TO_FIRST,
-        DRIVE_TO_SECOND,
-        SHOOT_AT_SECOND,
-        DRIVE_TO_THIRD,
-        DRIVE_TO_FOURTH,
-        SHOOT_AT_FOURTH,
-        DRIVE_TO_FIFTH,
-        DRIVE_TO_SIXTH,
-<<<<<<< HEAD
-        SHOOT_AT_SIXTH,
-        DRIVE_TO_SEVENTH,
-        DRIVE_TO_EIGHTH,
-        SHOOT_AT_EIGHTH,
+        // ---- vertical ball, first pass ----
+        DRIVE_TO_PATH3,
+        DRIVE_TO_PATH4,
+        DRIVE_TO_PATH5,
+        DRIVE_TO_PATH6,
+        SHOOT_AT_PATH6,
+
+        // ---- vertical ball, repeat ----
+        DRIVE_TO_PATH7,
+        DRIVE_TO_PATH8,
+        DRIVE_TO_PATH9,
+        DRIVE_TO_PATH10,
+        SHOOT_AT_PATH10,
+
+        // ---- secret tunnel ----
+        DRIVE_TO_PATH11,
+        DRIVE_TO_PATH12,
+        SHOOT_AT_PATH12,
+
     }
 
-    private static final Pose START_POSE   = new Pose(96, 9, Math.toRadians(0));
-    private static final Pose FIRST_POSE   = new Pose(130, 9.7, Math.toRadians(0));
-    private static final Pose SECOND_POSE  = new Pose(96, 9, Math.toRadians(0));
-    private static final Pose SECOND_CURVE = new Pose(101, 38, Math.toRadians(0));
-    private static final Pose THIRD_POSE   = new Pose(126, 34, Math.toRadians(0));
-    private static final Pose FOURTH_POSE  = new Pose(96, 15, Math.toRadians(0));
-    private static final Pose FIFTH_POSE   = new Pose(130, 9.7, Math.toRadians(0));
-    private static final Pose SIXTH_POSE = new Pose(96, 15, Math.toRadians(0));
-    private static final Pose SEVENTH_POSE   = new Pose(130, 42, Math.toRadians(30));
-    private static final Pose EIGHTH_POSE = new Pose(96, 15, Math.toRadians(0));
-=======
-        DRIVE_TO_SEVENTH,
-        SHOOT_AT_SEVENTH,
-    }
+    public static final Pose STARTING_POSE = new Pose(96, 15, Math.toRadians(0));
 
-    private static final Pose START_POSE   = new Pose(95, 9.7, Math.toRadians(90));
-    private static final Pose FIRST_POSE   = new Pose(130, 9.7, Math.toRadians(0));
-    private static final Pose SECOND_POSE  = new Pose(95, 9.7, Math.toRadians(0));
-    private static final Pose SECOND_CURVE = new Pose(101, 38, Math.toRadians(0));
-    private static final Pose THIRD_POSE   = new Pose(126, 34, Math.toRadians(0));
-    private static final Pose FOURTH_POSE  = new Pose(95, 9.7, Math.toRadians(0));
-    private static final Pose FIFTH_POSE   = new Pose(130, 9.7, Math.toRadians(0));
-    private static final Pose SIXTH_POSE   = new Pose(130, 42, Math.toRadians(30));
-    private static final Pose SEVENTH_POSE = new Pose(95, 9.7, Math.toRadians(0)); // same coords as FOURTH_POSE
+    //=====================REPEAT========================
+    //vertical  ball
+    private static final Pose PATH3_POSE = new Pose(130, 9, Math.toRadians(0)); // collects artifact
+    private static final Pose PATH4_POSE = new Pose(125, 9, Math.toRadians(0)); // goes back and forth
+    private static final Pose PATH5_POSE = new Pose(130, 9, Math.toRadians(0)); // collects again
+    private static final Pose PATH6_POSE = new Pose(96, 9, Math.toRadians(0)); //shooting
+    //repeat vertical ball
+    private static final Pose PATH7_POSE = new Pose(130, 9, Math.toRadians(0)); // collects artifact (r)
+    private static final Pose PATH8_POSE = new Pose(125, 9, Math.toRadians(0)); // goes back and forth
+    private static final Pose PATH9_POSE = new Pose(130, 9, Math.toRadians(0));  //collects again
+    private static final Pose PATH10_POSE = new Pose(96, 9, Math.toRadians(0)); // shooting
+    // goes to secret tunnel
+    private static final Pose PATH11_POSE = new Pose(130, 33, Math.toRadians(0)); // collects artifact
+    private static final Pose PATH12_POSE = new Pose(96, 15, Math.toRadians(0)); //shooting
 
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
+
     private static final double SHOT_DELAY_SECONDS  = 0.5;
     private static final double FIRING_TIME_SECONDS = 0.5;
 
@@ -77,12 +71,8 @@ public class RedFar1 extends OpMode {
     private final ElapsedTime stateTimer = new ElapsedTime();
 
     private Follower follower;
-<<<<<<< HEAD
-    private PathChain firstPath, secondPath, thirdPath, fourthPath, fifthPath, sixthPath, seventhPath, eighthPath;
-=======
-    private PathChain firstPath, secondPath, thirdPath, fourthPath, fifthPath, sixthPath, seventhPath;
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
-    private AutoState autoState = AutoState.DRIVE_TO_FIRST;
+    private PathChain thirdPath, fourthPath, fifthPath, sixthPath, seventhPath, eighthPath, ninthPath, tenthPath, eleventhPath, twelfthPath;
+    private AutoState autoState = AutoState.SHOOT_PRELOAD;
     private ShotCalculator.ShotResult shotResult;
 
     // sub-state shared by every SHOOT_AT_* state
@@ -91,52 +81,63 @@ public class RedFar1 extends OpMode {
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(START_POSE);
+        follower.setStartingPose(STARTING_POSE);
 
         artifactIntake.init(hardwareMap);
         shooter.init(hardwareMap);
         turret.init(hardwareMap);
 
-        firstPath = follower.pathBuilder()
-                .addPath(new BezierLine(START_POSE, FIRST_POSE))
-                .setLinearHeadingInterpolation(START_POSE.getHeading(), FIRST_POSE.getHeading())
+        // ---- vertical ball, first pass ----
+        thirdPath = follower.pathBuilder() // -> collect artifact
+                .addPath(new BezierLine(STARTING_POSE, PATH3_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        secondPath = follower.pathBuilder()
-                .addPath(new BezierLine(FIRST_POSE, SECOND_POSE))
-                .setConstantHeadingInterpolation(SECOND_POSE.getHeading())
+        fourthPath = follower.pathBuilder() // -> goes back and forth
+                .addPath(new BezierLine(PATH3_POSE, PATH4_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        thirdPath = follower.pathBuilder()
-                .addPath(new BezierCurve(SECOND_POSE, SECOND_CURVE, THIRD_POSE))
-                .setConstantHeadingInterpolation(THIRD_POSE.getHeading())
+        fifthPath = follower.pathBuilder() // -> collects again
+                .addPath(new BezierLine(PATH4_POSE, PATH5_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        fourthPath = follower.pathBuilder()
-                .addPath(new BezierLine(THIRD_POSE, FOURTH_POSE))
-                .setConstantHeadingInterpolation(FOURTH_POSE.getHeading())
+        sixthPath = follower.pathBuilder() // -> shooting
+                .addPath(new BezierLine(PATH5_POSE, PATH6_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        fifthPath = follower.pathBuilder()
-                .addPath(new BezierLine(FOURTH_POSE, FIFTH_POSE))
-                .setLinearHeadingInterpolation(FOURTH_POSE.getHeading(), FIFTH_POSE.getHeading())
+        // ---- repeat vertical ball ----
+        seventhPath = follower.pathBuilder() // -> collect artifact (r)
+                .addPath(new BezierLine(PATH6_POSE, PATH7_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        sixthPath = follower.pathBuilder()
-                .addPath(new BezierLine(FIFTH_POSE, SIXTH_POSE))
-                .setLinearHeadingInterpolation(FIFTH_POSE.getHeading(), SIXTH_POSE.getHeading())
+        eighthPath = follower.pathBuilder() // -> goes back and forth
+                .addPath(new BezierLine(PATH7_POSE, PATH8_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
-        seventhPath = follower.pathBuilder()
-                .addPath(new BezierLine(SIXTH_POSE, SEVENTH_POSE))
-                .setLinearHeadingInterpolation(SIXTH_POSE.getHeading(), SEVENTH_POSE.getHeading())
-<<<<<<< HEAD
+        ninthPath = follower.pathBuilder() // -> collects again
+                .addPath(new BezierLine(PATH8_POSE, PATH9_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
-        eighthPath = follower.pathBuilder()
-                .addPath(new BezierLine(SEVENTH_POSE, EIGHTH_POSE))
-                .setLinearHeadingInterpolation(SEVENTH_POSE.getHeading(), EIGHTH_POSE.getHeading())
-=======
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
+
+        tenthPath = follower.pathBuilder() // -> shooting
+                .addPath(new BezierLine(PATH9_POSE, PATH10_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .build();
+
+        // ---- goes to secret tunnel ----
+        eleventhPath = follower.pathBuilder() // -> collect artifact
+                .addPath(new BezierLine(PATH10_POSE, PATH11_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
+                .build();
+
+        twelfthPath = follower.pathBuilder() // -> shooting
+                .addPath(new BezierLine(PATH11_POSE, PATH12_POSE))
+                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .build();
 
         PoseStorage.clearAutoPose();
@@ -144,16 +145,12 @@ public class RedFar1 extends OpMode {
 
     @Override
     public void start() {
-        follower.setPose(START_POSE);
+        follower.setPose(STARTING_POSE);
         stateTimer.reset();
 
         artifactIntake.setState(ArtifactIntake.State.INTAKING);
-        follower.followPath(firstPath);
-<<<<<<< HEAD
-        autoState = AutoState.SHOOT_AT_FIRST;
-=======
-        autoState = AutoState.DRIVE_TO_FIRST;
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
+        follower.followPath(thirdPath);
+        autoState = AutoState.SHOOT_PRELOAD;
     }
 
     @Override
@@ -163,160 +160,118 @@ public class RedFar1 extends OpMode {
 
         switch (autoState) {
 
-<<<<<<< HEAD
-            case SHOOT_AT_FIRST:
-                shooter.spinUp();
-                beginShotSequence();
-                if(updateShotSequence()){
-                    autoState = AutoState.DRIVE_TO_FIRST;
-                }
-
-=======
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
-            case DRIVE_TO_FIRST:
-                if (!follower.isBusy()) {
-                    follower.followPath(secondPath);
-                    shooter.spinUp();
-                    autoState = AutoState.DRIVE_TO_SECOND;
-                }
-                break;
-
-            case DRIVE_TO_SECOND:
-                if (!follower.isBusy()) {
-                    beginShotSequence();
-                    autoState = AutoState.SHOOT_AT_SECOND;
-                }
-                break;
-
-            case SHOOT_AT_SECOND:
+            // ---- shoot the preloaded artifacts before moving ----
+            case SHOOT_PRELOAD:
                 if (updateShotSequence()) {
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(thirdPath);
-                    autoState = AutoState.DRIVE_TO_THIRD;
+                    autoState = AutoState.DRIVE_TO_PATH3;
                 }
                 break;
 
-            case DRIVE_TO_THIRD:
-<<<<<<< HEAD
+            // ---- vertical ball, first pass ----
+            case DRIVE_TO_PATH3: // collects artifact
                 if (!follower.isBusy()) {
                     follower.followPath(fourthPath);
-                    shooter.spinUp();
-                    autoState = AutoState.DRIVE_TO_FOURTH;
+                    autoState = AutoState.DRIVE_TO_PATH4;
                 }
                 break;
 
-            case DRIVE_TO_FOURTH:
+            case DRIVE_TO_PATH4: // goes back and forth
                 if (!follower.isBusy()) {
-                    beginShotSequence();
-                    autoState = AutoState.SHOOT_AT_FOURTH;
-                }
-                break;
-
-            case SHOOT_AT_FOURTH:
-                if (updateShotSequence()) {
-                    artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(fifthPath);
-                    autoState = AutoState.DRIVE_TO_FIFTH;
+                    autoState = AutoState.DRIVE_TO_PATH5;
                 }
                 break;
 
-            case DRIVE_TO_FIFTH:
+            case DRIVE_TO_PATH5: // collects again
                 if (!follower.isBusy()) {
                     follower.followPath(sixthPath);
-                    autoState = AutoState.DRIVE_TO_SIXTH;
-                }
-                break;
-
-            case DRIVE_TO_SIXTH:
-=======
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
-                if (!follower.isBusy()) {
-                    follower.followPath(fourthPath);
                     shooter.spinUp();
-<<<<<<< HEAD
-                    beginShotSequence();
-                    autoState = AutoState.SHOOT_AT_SIXTH;
+                    autoState = AutoState.DRIVE_TO_PATH6;
                 }
                 break;
 
-            case SHOOT_AT_SIXTH:
+            case DRIVE_TO_PATH6: // -> shooting
+                if (!follower.isBusy()) {
+                    beginShotSequence();
+                    autoState = AutoState.SHOOT_AT_PATH6;
+                }
+                break;
+
+            case SHOOT_AT_PATH6:
                 if (updateShotSequence()) {
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     follower.followPath(seventhPath);
-                    autoState = AutoState.DRIVE_TO_SEVENTH;
+                    autoState = AutoState.DRIVE_TO_PATH7;
                 }
                 break;
 
-            case DRIVE_TO_SEVENTH:
+            // ---- vertical ball, repeat ----
+            case DRIVE_TO_PATH7: // collects artifact (r)
                 if (!follower.isBusy()) {
                     follower.followPath(eighthPath);
+                    autoState = AutoState.DRIVE_TO_PATH8;
+                }
+                break;
+
+            case DRIVE_TO_PATH8: // goes back and forth
+                if (!follower.isBusy()) {
+                    follower.followPath(ninthPath);
+                    autoState = AutoState.DRIVE_TO_PATH9;
+                }
+                break;
+
+            case DRIVE_TO_PATH9: // collects again
+                if (!follower.isBusy()) {
+                    follower.followPath(tenthPath);
                     shooter.spinUp();
-                    autoState = AutoState.DRIVE_TO_EIGHTH;
+                    autoState = AutoState.DRIVE_TO_PATH10;
                 }
                 break;
 
-            case DRIVE_TO_EIGHTH:
+            case DRIVE_TO_PATH10: // -> shooting
                 if (!follower.isBusy()) {
                     beginShotSequence();
-                    autoState = AutoState.SHOOT_AT_EIGHTH;
-                }
-
-            case SHOOT_AT_EIGHTH:
-                if (updateShotSequence()) {
-                    // repeat
-=======
-                    autoState = AutoState.DRIVE_TO_FOURTH;
+                    autoState = AutoState.SHOOT_AT_PATH10;
                 }
                 break;
 
-            case DRIVE_TO_FOURTH:
-                if (!follower.isBusy()) {
-                    beginShotSequence();
-                    autoState = AutoState.SHOOT_AT_FOURTH;
-                }
-                break;
-
-            case SHOOT_AT_FOURTH:
+            case SHOOT_AT_PATH10:
                 if (updateShotSequence()) {
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                    follower.followPath(fifthPath);
-                    autoState = AutoState.DRIVE_TO_FIFTH;
+                    follower.followPath(eleventhPath);
+                    autoState = AutoState.DRIVE_TO_PATH11;
                 }
                 break;
 
-            case DRIVE_TO_FIFTH:
+            // ---- secret tunnel ----
+            case DRIVE_TO_PATH11: // collects artifact
                 if (!follower.isBusy()) {
-                    follower.followPath(sixthPath);
-                    autoState = AutoState.DRIVE_TO_SIXTH;
-                }
-                break;
-
-            case DRIVE_TO_SIXTH:
-                if (!follower.isBusy()) {
-                    follower.followPath(seventhPath);
+                    follower.followPath(twelfthPath);
                     shooter.spinUp();
-                    autoState = AutoState.DRIVE_TO_SEVENTH;
+                    autoState = AutoState.DRIVE_TO_PATH12;
                 }
                 break;
 
-            case DRIVE_TO_SEVENTH:
+            case DRIVE_TO_PATH12: // -> shooting
                 if (!follower.isBusy()) {
                     beginShotSequence();
-                    autoState = AutoState.SHOOT_AT_SEVENTH;
+                    autoState = AutoState.SHOOT_AT_PATH12;
                 }
                 break;
 
-            case SHOOT_AT_SEVENTH:
+            case SHOOT_AT_PATH12:
                 if (updateShotSequence()) {
-                    // SEVENTH_POSE == FOURTH_POSE, so heading back down
-                    // fifthPath repeats steps 5 -> 6 -> 7 for the next cycle.
->>>>>>> 71e52fca3cdcace0fe75202ce42e1e31f7fbf657
+                    //repeat
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                    follower.followPath(fifthPath);
-                    autoState = AutoState.DRIVE_TO_FIFTH;
+                    follower.followPath(thirdPath);
+                    autoState = AutoState.DRIVE_TO_PATH3;
                 }
                 break;
+
         }
+
 
         shooter.update();
         artifactIntake.update();
@@ -333,7 +288,6 @@ public class RedFar1 extends OpMode {
         artifactIntake.update();
         turret.stop();
     }
-
 
     private void beginShotSequence() {
         stateTimer.reset();
