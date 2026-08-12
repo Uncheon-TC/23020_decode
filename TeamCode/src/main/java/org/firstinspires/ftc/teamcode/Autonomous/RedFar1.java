@@ -154,7 +154,7 @@ public class RedFar1 extends OpMode {
 
         artifactIntake.setState(ArtifactIntake.State.INTAKING);
         follower.followPath(thirdPath);
-        autoState = AutoState.DRIVE_TO_PATH3;
+        autoState = AutoState.SHOOT_PRELOAD;
     }
 
     @Override

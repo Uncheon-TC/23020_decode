@@ -4,11 +4,20 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.TeleOp.TeleOpTest;
+import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
 public class MecanumDrive {
 
+    TeleOpTest teleOpTest = new TeleOpTest() {
+        @Override
+        protected ShooterConst.Goal getGoal() {
+            return null;
+        }
+    };
     private DcMotor FrontLeftMotor, FrontRightMotor, BackLeftMotor, BackRightMotor;
     private double driverHeadingRadians;
+
 
     GoBildaPinpoint GobildaPinpoint = new GoBildaPinpoint();
 
@@ -42,6 +51,9 @@ public class MecanumDrive {
     }
 
     public void MoveRobot(double y, double x, double rx){
+
+        double slow = 1 - (0.8 * teleOpTest.gamepad1.left_trigger);
+
         // 1. 센서 업데이트 및 헤딩 가져오기
         GobildaPinpoint.update();
         Pose2D position = GobildaPinpoint.ODO.getPosition();
@@ -57,10 +69,10 @@ public class MecanumDrive {
         // 3. 모터 파워 계산 및 정규화
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1.0);
 
-        double frontLeftPower  = (rotY + rotX + rx) / denominator;
-        double backLeftPower   = (rotY - rotX + rx) / denominator;
-        double frontRightPower = (rotY - rotX - rx) / denominator;
-        double backRightPower  = (rotY + rotX - rx) / denominator;
+        double frontLeftPower  = (rotY + rotX + rx) / denominator * slow;
+        double backLeftPower   = (rotY - rotX + rx) / denominator * slow;
+        double frontRightPower = (rotY - rotX - rx) / denominator * slow;
+        double backRightPower  = (rotY + rotX - rx) / denominator * slow;
 
         FrontLeftMotor.setPower(frontLeftPower);
         BackLeftMotor.setPower(backLeftPower);

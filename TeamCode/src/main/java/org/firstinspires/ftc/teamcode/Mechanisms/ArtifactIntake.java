@@ -62,4 +62,7 @@ public class ArtifactIntake {
         BackEaterMotor.setPower(backPower);
         ArtifactLid.setPosition(lidPosition);
     }
+
+
+
 }

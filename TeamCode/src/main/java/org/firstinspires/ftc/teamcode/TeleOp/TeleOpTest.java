@@ -77,6 +77,8 @@ public abstract class TeleOpTest extends OpMode {
 
     @Override
     public void loop(){
+
+
         double forward = -gamepad1.left_stick_y;
         double strafe = -gamepad1.left_stick_x;
         double turn = -gamepad1.right_stick_x;
@@ -104,7 +106,7 @@ public abstract class TeleOpTest extends OpMode {
         previousPoseResetCombo = poseResetCombo;
         previousTurretResetCombo = turretResetCombo;
 
-        if (gamepad1.left_trigger > 0.2) {
+        if (gamepad1.left_bumper) {
             artifactIntake.setState(ArtifactIntake.State.INTAKING);
         } else if (gamepad1.right_bumper) {
             artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
@@ -194,6 +196,7 @@ public abstract class TeleOpTest extends OpMode {
         }
         telemetry.update();
     }
+
 
     private Pose getRecoveryPose() {
         double recoveryX = activeGoal == ShooterConst.Goal.RED
