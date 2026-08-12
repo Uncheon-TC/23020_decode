@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "AutoRedFar 30s", group = "32020 AUTO")
-public class RedFar2 extends OpMode {
+@Autonomous(name = "AutoBlueFar 30s", group = "32020 AUTO")
+public class BlueFar2 extends OpMode {
 
     private enum AutoState {
 
@@ -48,32 +48,39 @@ public class RedFar2 extends OpMode {
         SHOOT_AT_PATH12,
     }
 
-    private static final Pose STARTING_POSE = new Pose(96, 9, Math.toRadians(0)); //starting pose
-
-    //horizontal ball
-    private static final Pose PATH1_CONTROL = new Pose(100, 39, Math.toRadians(0)); // curve
-    private static final Pose PATH1_POSE    = new Pose(126, 34, Math.toRadians(0)); // collects artifact
-    private static final Pose PATH2_POSE    = new Pose(96, 15, Math.toRadians(0)); // shooting
-
-
-    //=====================REPEAT========================
-
-    //vertical  ball
-    private static final Pose PATH3_POSE = new Pose(130, 9, Math.toRadians(0)); // collects artifact
-    private static final Pose PATH4_POSE = new Pose(125, 9, Math.toRadians(0)); // goes back and forth
-    private static final Pose PATH5_POSE = new Pose(130, 9, Math.toRadians(0)); // collects again
-    private static final Pose PATH6_POSE = new Pose(96, 9, Math.toRadians(0)); //shooting
-
-    //repeat vertical ball
-    private static final Pose PATH7_POSE = new Pose(130, 9, Math.toRadians(0)); // collects artifact (r)
-    private static final Pose PATH8_POSE = new Pose(125, 9, Math.toRadians(0)); // goes back and forth
-    private static final Pose PATH9_POSE = new Pose(130, 9, Math.toRadians(0));  //collects again
-    private static final Pose PATH10_POSE = new Pose(96, 9, Math.toRadians(0)); // shooting
-
+    private static final Pose STARTING_POSE =
+            new Pose(48, 9, Math.toRadians(180)); // starting pose
+    // horizontal ball
+    private static final Pose PATH1_CONTROL =
+            new Pose(44, 39, Math.toRadians(180)); // curve
+    private static final Pose PATH1_POSE =
+            new Pose(18, 34, Math.toRadians(180)); // collects artifact
+    private static final Pose PATH2_POSE =
+            new Pose(48, 15, Math.toRadians(180)); // shooting
+//=====================REPEAT========================
+    // vertical ball
+    private static final Pose PATH3_POSE =
+            new Pose(14, 9, Math.toRadians(180)); // collects artifact
+    private static final Pose PATH4_POSE =
+            new Pose(19, 9, Math.toRadians(180)); // goes back and forth
+    private static final Pose PATH5_POSE =
+            new Pose(14, 9, Math.toRadians(180)); // collects again
+    private static final Pose PATH6_POSE =
+            new Pose(48, 9, Math.toRadians(180)); // shooting
+    // repeat vertical ball
+    private static final Pose PATH7_POSE =
+            new Pose(14, 9, Math.toRadians(180)); // collects artifact (r)
+    private static final Pose PATH8_POSE =
+            new Pose(19, 9, Math.toRadians(180)); // goes back and forth
+    private static final Pose PATH9_POSE =
+            new Pose(14, 9, Math.toRadians(180)); // collects again
+    private static final Pose PATH10_POSE =
+            new Pose(48, 9, Math.toRadians(180)); // shooting
     // goes to secret tunnel
-    private static final Pose PATH11_POSE = new Pose(130, 33, Math.toRadians(0)); // collects artifact
-    private static final Pose PATH12_POSE = new Pose(96, 15, Math.toRadians(0)); //shooting
-
+    private static final Pose PATH11_POSE =
+            new Pose(14, 33, Math.toRadians(180)); // collects artifact
+    private static final Pose PATH12_POSE =
+            new Pose(48, 15, Math.toRadians(180)); // shooting
     //======================================================
 
 
@@ -322,13 +329,13 @@ public class RedFar2 extends OpMode {
 
         shooter.update();
         artifactIntake.update();
-        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.RED);
+        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.BLUE);
         updateTelemetry();
     }
 
     @Override
     public void stop() {
-        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.RED);
+        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.BLUE);
         shooter.stop();
         shooter.update();
         artifactIntake.setState(ArtifactIntake.State.IDLE);
@@ -369,15 +376,15 @@ public class RedFar2 extends OpMode {
 
         shotResult = shooter.aimAt(
                 pose,
-                ShooterConst.RED_GOAL_X,
-                ShooterConst.RED_GOAL_Y,
+                ShooterConst.BLUE_GOAL_X,
+                ShooterConst.BLUE_GOAL_Y,
                 velocity.getXComponent(),
                 velocity.getYComponent());
 
         if (shotResult != null) {
-            turret.trackPoint(pose, ShooterConst.RED_GOAL_X, ShooterConst.RED_GOAL_Y, shotResult.turretOffset);
+            turret.trackPoint(pose, ShooterConst.BLUE_GOAL_X, ShooterConst.BLUE_GOAL_Y, shotResult.turretOffset);
         } else {
-            turret.trackPoint(pose, ShooterConst.RED_GOAL_X, ShooterConst.RED_GOAL_Y);
+            turret.trackPoint(pose, ShooterConst.BLUE_GOAL_X, ShooterConst.BLUE_GOAL_Y);
         }
     }
 

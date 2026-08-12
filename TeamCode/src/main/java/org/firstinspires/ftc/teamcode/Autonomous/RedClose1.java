@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subConstant.AutoConst;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "AutoRedClose1 30s", group = "32020 AUTO")
+@Autonomous(name = "AutoRedClose1 30s/60s", group = "32020 AUTO")
 public class RedClose1 extends OpMode {
     private enum AutoState {
         DRIVE_TO_FIRST_AND_SHOOT,

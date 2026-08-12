@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subConstant.AutoConst;
 import org.firstinspires.ftc.teamcode.subConstant.PoseStorage;
 import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 
-@Autonomous(name = "AutoRedFar1 30s", group = "32020 AUTO")
+@Autonomous(name = "AutoBlueClose1 30s/60s", group = "32020 AUTO")
 public class BlueClose1 extends OpMode {
     private enum AutoState {
         DRIVE_TO_FIRST_AND_SHOOT,
@@ -365,13 +365,13 @@ public class BlueClose1 extends OpMode {
 
         shooter.update();
         artifactIntake.update();
-        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.RED);
+        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.BLUE);
         updateTelemetry();
     }
 
     @Override
     public void stop() {
-        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.RED);
+        PoseStorage.saveAutoPose(follower.getPose(), ShooterConst.Goal.BLUE);
         shooter.stop();
         shooter.update();
         artifactIntake.setState(ArtifactIntake.State.IDLE);
@@ -385,22 +385,22 @@ public class BlueClose1 extends OpMode {
 
         shotResult = shooter.aimAt(
                 pose,
-                ShooterConst.RED_GOAL_X,
-                ShooterConst.RED_GOAL_Y,
+                ShooterConst.BLUE_GOAL_X,
+                ShooterConst.BLUE_GOAL_Y,
                 velocity.getXComponent(),
                 velocity.getYComponent());
 
         if (shotResult != null) {
             turret.trackPoint(
                     pose,
-                    ShooterConst.RED_GOAL_X,
-                    ShooterConst.RED_GOAL_Y,
+                    ShooterConst.BLUE_GOAL_X,
+                    ShooterConst.BLUE_GOAL_Y,
                     shotResult.turretOffset);
         } else {
             turret.trackPoint(
                     pose,
-                    ShooterConst.RED_GOAL_X,
-                    ShooterConst.RED_GOAL_Y);
+                    ShooterConst.BLUE_GOAL_X,
+                    ShooterConst.BLUE_GOAL_Y);
         }
     }
 

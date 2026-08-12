@@ -21,7 +21,11 @@ import org.firstinspires.ftc.teamcode.subConstant.ShooterConst;
 @Autonomous(name = "AutoRedFar 60s", group = "32020 AUTO")
 public class RedFar1 extends OpMode {
     private enum AutoState {
+
+        //-------canceled just in case--------
         SHOOT_PRELOAD,
+
+        //------------------------------------
 
         // ---- vertical ball, first pass ----
         DRIVE_TO_PATH3,
@@ -150,7 +154,7 @@ public class RedFar1 extends OpMode {
 
         artifactIntake.setState(ArtifactIntake.State.INTAKING);
         follower.followPath(thirdPath);
-        autoState = AutoState.SHOOT_PRELOAD;
+        autoState = AutoState.DRIVE_TO_PATH3;
     }
 
     @Override
@@ -160,6 +164,7 @@ public class RedFar1 extends OpMode {
 
         switch (autoState) {
 
+            //==================CANCELED========================
             // ---- shoot the preloaded artifacts before moving ----
             case SHOOT_PRELOAD:
                 if (updateShotSequence()) {
@@ -168,6 +173,8 @@ public class RedFar1 extends OpMode {
                     autoState = AutoState.DRIVE_TO_PATH3;
                 }
                 break;
+
+            //==================================================
 
             // ---- vertical ball, first pass ----
             case DRIVE_TO_PATH3: // collects artifact
