@@ -88,7 +88,7 @@ public class RedClose2 extends OpMode {
 
     // 두 번째 줄 수집 후 게이트를 살짝 여는 위치이다.
     private static final Pose FOURTH_POSE =
-            new Pose(126, 65, Math.toRadians(0));
+            new Pose(125, 68, Math.toRadians(0));
 
     // 세 번째 슈팅 및 반복 슈팅에 사용하는 위치이다.
     private static final Pose FIFTH_POSE =
@@ -100,7 +100,7 @@ public class RedClose2 extends OpMode {
 
     // 게이트 안쪽에서 유물을 수집하는 최종 위치이다.
     private static final Pose GATE_POSE =
-            new Pose(130.5, 63  , Math.toRadians(27));
+            new Pose(130.5, 62  , Math.toRadians(27));
 
 
 
