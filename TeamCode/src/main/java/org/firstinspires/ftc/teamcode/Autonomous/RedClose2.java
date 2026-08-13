@@ -100,7 +100,7 @@ public class RedClose2 extends OpMode {
 
     // 게이트 안쪽에서 유물을 수집하는 최종 위치이다.
     private static final Pose GATE_POSE =
-            new Pose(130.5, 62  , Math.toRadians(27));
+            new Pose(131.5, 62  , Math.toRadians(27));
 
 
 
