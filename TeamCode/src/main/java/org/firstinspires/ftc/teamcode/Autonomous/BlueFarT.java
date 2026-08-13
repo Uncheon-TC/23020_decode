@@ -49,7 +49,7 @@ public class BlueFarT extends OpMode {
     // 벽이나 유물에 걸렸을 때 한 경로에서 무한히 머무르지 않게 하는 제한시간이다.
     private static final double PATH_TIMEOUT_SECONDS = 2.5;
     // 마지막 2초를 주차에 사용하기 위해 주차를 시작하는 시간이다.
-    private static final double PARK_START_SECONDS = 58.0;
+    private static final double PARK_START_SECONDS = 55.0;
     // 이 시간이 되면 주차 성공 여부와 관계없이 OpMode를 종료한다.
     private static final double AUTO_END_SECONDS = 60.0;
     // BlueFarT에서만 사용하는 블루 골대 조준 X 좌표이다.
@@ -97,6 +97,8 @@ public class BlueFarT extends OpMode {
     private ShotCalculator.ShotResult shotResult;
     private boolean lastPathTimedOut;
     private boolean parkingStarted;
+    // 현재 반복 사이클에서 아래쪽 로딩존 수집과 발사를 완료한 횟수이다.
+    private int lowerLoadingCyclesCompleted;
 
     @Override
     public void init() {
@@ -171,6 +173,7 @@ public class BlueFarT extends OpMode {
         // 58초 주차와 60초 종료를 판단할 전체 타이머를 시작한다.
         autoTimer.reset();
         parkingStarted = false;
+        lowerLoadingCyclesCompleted = 0;
         autoState = AutoState.WAIT_FOR_PRELOAD_SHOT;
     }
 
@@ -243,7 +246,9 @@ public class BlueFarT extends OpMode {
             case PATH2_FIRING:
                 artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
                 if (isFiringComplete()) {
-                    // 경로 3부터 반복 구간을 시작한다.
+                    // 경로 1~2에서 아래쪽 로딩존의 첫 번째 수집과 발사를 완료했다.
+                    lowerLoadingCyclesCompleted = 1;
+                    // 경로 3~4로 아래쪽 로딩존의 두 번째 수집을 시작한다.
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     startPath(path3);
                     autoState = AutoState.DRIVE_PATH3_INTAKE;
@@ -276,10 +281,19 @@ public class BlueFarT extends OpMode {
             case PATH4_FIRING:
                 artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
                 if (isFiringComplete()) {
-                    // 경로 5로 위쪽 로딩존을 수집하러 이동한다.
+                    // 경로 3~4를 통한 아래쪽 로딩존 수집과 발사 횟수를 기록한다.
+                    lowerLoadingCyclesCompleted++;
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
-                    startPath(path5);
-                    autoState = AutoState.DRIVE_PATH5_INTAKE;
+
+                    if (lowerLoadingCyclesCompleted < 2) {
+                        // 이번 사이클의 아래쪽 수집이 한 번뿐이면 경로 3~4를 한 번 더 반복한다.
+                        startPath(path3);
+                        autoState = AutoState.DRIVE_PATH3_INTAKE;
+                    } else {
+                        // 아래쪽 수집을 두 번 마쳤으므로 경로 5로 위쪽 로딩존을 수집한다.
+                        startPath(path5);
+                        autoState = AutoState.DRIVE_PATH5_INTAKE;
+                    }
                 }
                 break;
 
@@ -309,7 +323,9 @@ public class BlueFarT extends OpMode {
             case PATH6_FIRING:
                 artifactIntake.setState(ArtifactIntake.State.OUTTAKING);
                 if (isFiringComplete()) {
-                    // 경로 6 발사가 끝나면 경로 3부터 6까지 계속 반복한다.
+                    // 위쪽 로딩존 발사가 끝났으므로 다음 반복 사이클의 아래쪽 횟수를 초기화한다.
+                    lowerLoadingCyclesCompleted = 0;
+                    // 다음 사이클도 경로 3~4를 두 번 실행한 뒤 경로 5~6을 실행한다.
                     artifactIntake.setState(ArtifactIntake.State.INTAKING);
                     startPath(path3);
                     autoState = AutoState.DRIVE_PATH3_INTAKE;
@@ -495,4 +511,3 @@ public class BlueFarT extends OpMode {
         telemetry.update();
     }
 }
-
