@@ -53,6 +53,10 @@ public class RedClose2 extends OpMode {
     private static final double INTAKING_TIME_SECONDS = 1.5;
     // 경로 또는 패스체인이 이 시간을 넘기면 강제로 종료하고 다음 상태로 진행한다.
     private static final double PATH_TIMEOUT_SECONDS = 2.5;
+    // 일반 경로에서 사용하는 최대 구동 출력이다.
+    private static final double DEFAULT_PATH_MAX_POWER = 1.0;
+    // SIXTH_POSE에서 GATE_POSE로 진입할 때만 사용하는 낮은 최대 출력이다.
+    private static final double GATE_APPROACH_MAX_POWER = 0.4;
 
     // 유물을 흡입하거나 슈터 방향으로 내보내는 인테이크 장치이다.
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
@@ -63,7 +67,7 @@ public class RedClose2 extends OpMode {
     // Pose의 X, Y 단위는 인치이고 헤딩 단위는 라디안이다.
     // 자율주행 시작 위치: (109, 134), 로봇 방향 90도.
     private static final Pose START_POSE =
-            new Pose(109, 134, Math.toRadians(90));
+            new Pose(110, 133, Math.toRadians(90));
 
     // 첫 번째 슈팅 위치이며 게이트 반복 사이클의 슈팅 위치와는 구분된다.
     private static final Pose FIRST_POSE =
@@ -84,19 +88,19 @@ public class RedClose2 extends OpMode {
 
     // 두 번째 줄 수집 후 게이트를 살짝 여는 위치이다.
     private static final Pose FOURTH_POSE =
-            new Pose(126, 62, Math.toRadians(0));
+            new Pose(126, 65, Math.toRadians(0));
 
     // 세 번째 슈팅 및 반복 슈팅에 사용하는 위치이다.
     private static final Pose FIFTH_POSE =
-            new Pose(91, 76, Math.toRadians(340));
+            new Pose(94, 79, Math.toRadians(340));
 
     // 게이트 진입 경로와 복귀 경로가 공통으로 지나는 중간 위치이다.
     private static final Pose SIXTH_POSE =
-            new Pose(119, 65, Math.toRadians(340));
+            new Pose(119, 69, Math.toRadians(340));
 
     // 게이트 안쪽에서 유물을 수집하는 최종 위치이다.
     private static final Pose GATE_POSE =
-            new Pose(130.5, 59, Math.toRadians(27));
+            new Pose(130.5, 63  , Math.toRadians(27));
 
 
 
@@ -204,6 +208,10 @@ public class RedClose2 extends OpMode {
                 .addPath(new BezierLine(SIXTH_POSE, GATE_POSE))
                 // 게이트에 진입하면서 헤딩을 340도에서 27도로 변경한다.
                 .setLinearHeadingInterpolation(Math.toRadians(340), Math.toRadians(27))
+                // 경로 8이 시작되는 순간 최대 출력을 낮춰 게이트에 천천히 진입한다.
+                .addParametricCallback(
+                        0.0,
+                        () -> follower.setMaxPowerScaling(GATE_APPROACH_MAX_POWER))
                 .build();
 
         // 경로 9와 10: 게이트에서 슈팅 위치로 복귀한다.
@@ -554,13 +562,15 @@ public class RedClose2 extends OpMode {
 
     // 모든 경로 시작을 이 메서드로 통일하여 경로 전용 타이머가 빠짐없이 초기화되게 한다.
     private void startPath(PathChain path) {
-        // 현재 경로의 3초 제한시간 측정을 시작한다.
+        // 게이트 진입에서 낮춘 출력을 다음 경로 시작 전에 기본값으로 복원한다.
+        follower.setMaxPowerScaling(DEFAULT_PATH_MAX_POWER);
+        // 현재 경로의 2.5초 제한시간 측정을 시작한다.
         pathTimer.reset();
         // Pedro Follower에 새 경로 추종을 요청한다.
         follower.followPath(path);
     }
 
-    // 경로가 정상 완료됐거나 3초 제한시간을 넘겼으면 true를 반환한다.
+    // 경로가 정상 완료됐거나 2.5초 제한시간을 넘겼으면 true를 반환한다.
     private boolean isPathFinishedOrTimedOut() {
         // Follower가 더 이상 경로를 추종하지 않으면 정상 완료이다.
         if (!follower.isBusy()) {
@@ -569,12 +579,12 @@ public class RedClose2 extends OpMode {
             return true;
         }
 
-        // 아직 3초가 지나지 않았으면 현재 경로를 계속 추종한다.
+        // 아직 2.5초가 지나지 않았으면 현재 경로를 계속 추종한다.
         if (pathTimer.seconds() < PATH_TIMEOUT_SECONDS) {
             return false;
         }
 
-        // 3초를 넘긴 경로 출력을 해제하여 벽을 계속 밀지 않도록 한다.
+        // 2.5초를 넘긴 경로 출력을 해제하여 벽을 계속 밀지 않도록 한다.
         follower.breakFollowing();
         // 텔레메트리에서 시간 초과를 확인할 수 있도록 기록한다.
         lastPathTimedOut = true;
@@ -630,7 +640,7 @@ public class RedClose2 extends OpMode {
         telemetry.addData("pathBusy", follower.isBusy());
         // 현재 경로가 시작된 뒤 흐른 시간을 표시한다.
         telemetry.addData("pathTime", pathTimer.seconds());
-        // 가장 최근 경로가 3초 시간 초과로 종료됐는지 표시한다.
+        // 가장 최근 경로가 2.5초 시간 초과로 종료됐는지 표시한다.
         telemetry.addData("pathTimedOut", lastPathTimedOut);
         // 현재 슈터 상태를 표시한다.
         telemetry.addData("shooterState", shooter.getState());

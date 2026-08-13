@@ -58,19 +58,19 @@ public class RedFarT extends OpMode {
             new Pose(96, 9, Math.toRadians(0));
     // 경로 1의 끝: 아래쪽 로딩존이다.
     private static final Pose LOWER_LOADING_POSE =
-            new Pose(133, 15, Math.toRadians(0));
+            new Pose(131, 15, Math.toRadians(0));
     // 경로 2, 4, 6의 끝: 공통 슈팅 위치이다.
     private static final Pose SHOOTING_POSE =
-            new Pose(94, 15, Math.toRadians(0));
+            new Pose(94, 18, Math.toRadians(0));
     // 경로 5 곡선의 모양을 결정하는 제어점이다.
     private static final Pose UPPER_LOADING_CONTROL_POSE =
-            new Pose(104, 35, Math.toRadians(0));
+            new Pose(104, 45, Math.toRadians(0));
     // 경로 5의 끝: 위쪽 로딩존이다.
     private static final Pose UPPER_LOADING_POSE =
-            new Pose(133, 36, Math.toRadians(0));
+            new Pose(132, 36, Math.toRadians(0));
     // 58초부터 이동할 최종 주차 위치이다.
     private static final Pose PARK_POSE =
-            new Pose(107, 17, Math.toRadians(0));
+            new Pose(107, 22, Math.toRadians(0));
 
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
     private final Shooter shooter = new Shooter();
