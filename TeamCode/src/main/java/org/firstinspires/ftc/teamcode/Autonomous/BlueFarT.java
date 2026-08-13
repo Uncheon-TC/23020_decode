@@ -43,7 +43,7 @@ public class BlueFarT extends OpMode {
     // 시작 위치에서 프리로드를 발사하기 전에 기다리는 시간이다.
     private static final double PRELOAD_SHOT_DELAY_SECONDS = 0.5;
     // 이동 경로가 끝난 뒤 두 번째 이후 발사 전에 기다리는 시간이다.
-    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.2;
+    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.5;
     // 세 개의 유물을 슈터로 밀어내는 아웃테이크 유지시간이다.
     private static final double FIRING_TIME_SECONDS = 0.5;
     // 벽이나 유물에 걸렸을 때 한 경로에서 무한히 머무르지 않게 하는 제한시간이다.
@@ -52,25 +52,27 @@ public class BlueFarT extends OpMode {
     private static final double PARK_START_SECONDS = 58.0;
     // 이 시간이 되면 주차 성공 여부와 관계없이 OpMode를 종료한다.
     private static final double AUTO_END_SECONDS = 60.0;
+    // BlueFarT에서만 사용하는 블루 골대 조준 X 좌표이다.
+    private static final double BLUE_FAR_GOAL_X = 5.0; // 필요한 경우 수정
 
     // 시작 및 반복 슈팅 위치이다.
     private static final Pose START_POSE =
-            new Pose(48, 9, Math.toRadians(180));
+            new Pose(48, 9.5, Math.toRadians(180));
     // 경로 1의 끝: 아래쪽 로딩존이다.
     private static final Pose LOWER_LOADING_POSE =
-            new Pose(11, 15, Math.toRadians(180));
+            new Pose(13, 15, Math.toRadians(180));
     // 경로 2, 4, 6의 끝: 공통 슈팅 위치이다.
     private static final Pose SHOOTING_POSE =
-            new Pose(50, 15, Math.toRadians(180));
+            new Pose(50, 18, Math.toRadians(180));
     // 경로 5 곡선의 모양을 결정하는 제어점이다.
     private static final Pose UPPER_LOADING_CONTROL_POSE =
-            new Pose(40, 35, Math.toRadians(180));
+            new Pose(40, 45, Math.toRadians(180));
     // 경로 5의 끝: 위쪽 로딩존이다.
     private static final Pose UPPER_LOADING_POSE =
-            new Pose(11, 36, Math.toRadians(180));
+            new Pose(12, 36, Math.toRadians(180));
     // 58초부터 이동할 최종 주차 위치이다.
     private static final Pose PARK_POSE =
-            new Pose(37, 17, Math.toRadians(180));
+            new Pose(37, 22, Math.toRadians(180));
 
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
     private final Shooter shooter = new Shooter();
@@ -448,7 +450,7 @@ public class BlueFarT extends OpMode {
 
         shotResult = shooter.aimAt(
                 pose,
-                ShooterConst.BLUE_GOAL_X,
+                BLUE_FAR_GOAL_X,
                 ShooterConst.BLUE_GOAL_Y,
                 velocity.getXComponent(),
                 velocity.getYComponent());
@@ -456,13 +458,13 @@ public class BlueFarT extends OpMode {
         if (shotResult != null) {
             turret.trackPoint(
                     pose,
-                    ShooterConst.BLUE_GOAL_X,
+                    BLUE_FAR_GOAL_X,
                     ShooterConst.BLUE_GOAL_Y,
                     shotResult.turretOffset);
         } else {
             turret.trackPoint(
                     pose,
-                    ShooterConst.BLUE_GOAL_X,
+                    BLUE_FAR_GOAL_X,
                     ShooterConst.BLUE_GOAL_Y);
         }
     }

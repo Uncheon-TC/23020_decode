@@ -50,13 +50,13 @@ public class RedClose2 extends OpMode {
     private static final double FIRING_TIME_SECONDS = 0.5;
 
     // 경로 8 끝의 게이트 위치에서 추가로 수집하는 시간이다.
-    private static final double INTAKING_TIME_SECONDS = 1.7;
+    private static final double INTAKING_TIME_SECONDS = 1.5;
     // 경로 또는 패스체인이 이 시간을 넘기면 강제로 종료하고 다음 상태로 진행한다.
     private static final double PATH_TIMEOUT_SECONDS = 2.3;
     // 일반 경로에서 사용하는 최대 구동 출력이다.
     private static final double DEFAULT_PATH_MAX_POWER = 1.0;
     // SIXTH_POSE에서 GATE_POSE로 진입할 때만 사용하는 낮은 최대 출력이다.
-    private static final double GATE_APPROACH_MAX_POWER = 0.3;
+    private static final double GATE_APPROACH_MAX_POWER = 0.4;
 
     private static final double RED_CLOSE_GOAL_X = 139.0; // 필요한 경우 수정
 
