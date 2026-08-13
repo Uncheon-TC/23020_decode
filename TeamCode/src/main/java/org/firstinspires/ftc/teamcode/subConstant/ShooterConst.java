@@ -36,8 +36,8 @@ public class ShooterConst {
     public static double RED_GOAL_Y = 144;
     public static double BLUE_GOAL_X = 0;
     public static double BLUE_GOAL_Y = 144;
-    public static double SCORE_HEIGHT = 24.5;
-    public static double SCORE_ANGLE = Math.toRadians(-35);
+    public static double SCORE_HEIGHT = 24;
+    public static double SCORE_ANGLE = Math.toRadians(-38);
 
     public static double HOOD_MIN_ANGLE = Math.toRadians(41);
     public static double HOOD_MAX_ANGLE = Math.toRadians(55);
@@ -46,9 +46,9 @@ public class ShooterConst {
 
     public static double FLYWHEEL_TPR = 28; // 5000series 6000rpm motor
     public static double WHEEL_RADIUS = 1.417; // 라이노휠 큰거 1.89
-    public static double SHOOTER_POWER_RATIO = 2.3; // 가까운 거리에서의 파워 조절
-    public static double SHOOTER_POWER_RATIO_MAX = 3.0; // 먼거리에서의 파워 조절
-    public static double TURRET_MOVEMENT_COMPENSATION = 1.2;
+    public static double SHOOTER_POWER_RATIO = 2.2; // 가까운 거리에서의 파워 조절
+    public static double SHOOTER_POWER_RATIO_MAX = 3.12; // 먼거리에서의 파워 조절
+    public static double TURRET_MOVEMENT_COMPENSATION = 1;
     public static double SHOOTER_BACKWARD_VELOCITY_COMPENSATION = 1.2; // 슈터 속도 보정(이동하면서 슈팅할때 속도 값을 25% 더 강하게 반영)
 
     // The ratio reaches its maximum at this field position.

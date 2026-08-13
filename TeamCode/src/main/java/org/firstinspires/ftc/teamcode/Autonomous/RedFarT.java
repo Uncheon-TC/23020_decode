@@ -43,7 +43,7 @@ public class RedFarT extends OpMode {
     // 시작 위치에서 프리로드를 발사하기 전에 기다리는 시간이다.
     private static final double PRELOAD_SHOT_DELAY_SECONDS = 0.5;
     // 이동 경로가 끝난 뒤 두 번째 이후 발사 전에 기다리는 시간이다.
-    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.2;
+    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 1;
     // 세 개의 유물을 슈터로 밀어내는 아웃테이크 유지시간이다.
     private static final double FIRING_TIME_SECONDS = 0.5;
     // 벽이나 유물에 걸렸을 때 한 경로에서 무한히 머무르지 않게 하는 제한시간이다.
@@ -52,10 +52,12 @@ public class RedFarT extends OpMode {
     private static final double PARK_START_SECONDS = 58.0;
     // 이 시간이 되면 주차 성공 여부와 관계없이 OpMode를 종료한다.
     private static final double AUTO_END_SECONDS = 60.0;
+    // RedFarT에서만 사용하는 레드 골대 조준 X 좌표이다.
+    private static final double RED_FAR_GOAL_X = 139.0; // 필요한 경우 수정
 
     // 시작 및 반복 슈팅 위치이다.
     private static final Pose START_POSE =
-            new Pose(96, 9, Math.toRadians(0));
+            new Pose(96, 9.5, Math.toRadians(0));
     // 경로 1의 끝: 아래쪽 로딩존이다.
     private static final Pose LOWER_LOADING_POSE =
             new Pose(131, 15, Math.toRadians(0));
@@ -448,7 +450,7 @@ public class RedFarT extends OpMode {
 
         shotResult = shooter.aimAt(
                 pose,
-                ShooterConst.RED_GOAL_X,
+                RED_FAR_GOAL_X,
                 ShooterConst.RED_GOAL_Y,
                 velocity.getXComponent(),
                 velocity.getYComponent());
@@ -456,13 +458,13 @@ public class RedFarT extends OpMode {
         if (shotResult != null) {
             turret.trackPoint(
                     pose,
-                    ShooterConst.RED_GOAL_X,
+                    RED_FAR_GOAL_X,
                     ShooterConst.RED_GOAL_Y,
                     shotResult.turretOffset);
         } else {
             turret.trackPoint(
                     pose,
-                    ShooterConst.RED_GOAL_X,
+                    RED_FAR_GOAL_X,
                     ShooterConst.RED_GOAL_Y);
         }
     }

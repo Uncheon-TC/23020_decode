@@ -45,18 +45,20 @@ public class RedClose2 extends OpMode {
     // 시작 후 너무 가까운 위치에서 발사하지 않도록 기다리는 시간이다.
     private static final double FIRST_SHOT_DELAY_SECONDS = 0.5;
     // 두 번째 발사부터 각 슈팅 위치에 도착한 뒤 기다리는 시간이다.
-    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.2;
+    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.1;
     // 한 번 발사할 때 아웃테이크를 유지하는 시간이다.
     private static final double FIRING_TIME_SECONDS = 0.5;
 
     // 경로 8 끝의 게이트 위치에서 추가로 수집하는 시간이다.
-    private static final double INTAKING_TIME_SECONDS = 1.5;
+    private static final double INTAKING_TIME_SECONDS = 1.7;
     // 경로 또는 패스체인이 이 시간을 넘기면 강제로 종료하고 다음 상태로 진행한다.
-    private static final double PATH_TIMEOUT_SECONDS = 2.5;
+    private static final double PATH_TIMEOUT_SECONDS = 2.3;
     // 일반 경로에서 사용하는 최대 구동 출력이다.
     private static final double DEFAULT_PATH_MAX_POWER = 1.0;
     // SIXTH_POSE에서 GATE_POSE로 진입할 때만 사용하는 낮은 최대 출력이다.
-    private static final double GATE_APPROACH_MAX_POWER = 0.4;
+    private static final double GATE_APPROACH_MAX_POWER = 0.3;
+
+    private static final double RED_CLOSE_GOAL_X = 139.0; // 필요한 경우 수정
 
     // 유물을 흡입하거나 슈터 방향으로 내보내는 인테이크 장치이다.
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
@@ -84,11 +86,11 @@ public class RedClose2 extends OpMode {
 
     // 경로 4의 끝이자 경로 5의 시작 위치이다.
     private static final Pose THIRD_POSE =
-            new Pose(121, 60, Math.toRadians(0));
+            new Pose(121, 62, Math.toRadians(350));
 
     // 두 번째 줄 수집 후 게이트를 살짝 여는 위치이다.
     private static final Pose FOURTH_POSE =
-            new Pose(125, 68, Math.toRadians(0));
+            new Pose(121, 62, Math.toRadians(340));
 
     // 세 번째 슈팅 및 반복 슈팅에 사용하는 위치이다.
     private static final Pose FIFTH_POSE =
@@ -96,11 +98,11 @@ public class RedClose2 extends OpMode {
 
     // 게이트 진입 경로와 복귀 경로가 공통으로 지나는 중간 위치이다.
     private static final Pose SIXTH_POSE =
-            new Pose(119, 69, Math.toRadians(340));
+            new Pose(116, 71.5, Math.toRadians(340));
 
     // 게이트 안쪽에서 유물을 수집하는 최종 위치이다.
     private static final Pose GATE_POSE =
-            new Pose(131.5, 62  , Math.toRadians(27));
+            new Pose(130.5, 62.5  , Math.toRadians(27));
 
 
 
@@ -603,7 +605,7 @@ public class RedClose2 extends OpMode {
         // 반환값에는 플라이휠 속도, 후드 각도, 이동 중 터렛 보정값이 들어 있다.
         shotResult = shooter.aimAt(
                 pose,
-                ShooterConst.RED_GOAL_X,
+                RED_CLOSE_GOAL_X,
                 ShooterConst.RED_GOAL_Y,
                 velocity.getXComponent(),
                 velocity.getYComponent());
@@ -612,14 +614,14 @@ public class RedClose2 extends OpMode {
         if (shotResult != null) {
             turret.trackPoint(
                     pose,
-                    ShooterConst.RED_GOAL_X,
+                    RED_CLOSE_GOAL_X,
                     ShooterConst.RED_GOAL_Y,
                     shotResult.turretOffset);
         } else {
             // 계산 결과가 없으면 속도 보정 없이 골대 좌표만 조준한다.
             turret.trackPoint(
                     pose,
-                    ShooterConst.RED_GOAL_X,
+                    RED_CLOSE_GOAL_X,
                     ShooterConst.RED_GOAL_Y);
         }
     }

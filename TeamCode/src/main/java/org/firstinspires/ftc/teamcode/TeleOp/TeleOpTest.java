@@ -136,7 +136,7 @@ public abstract class TeleOpTest extends OpMode {
 
         if(gamepad2.yWasPressed()){
             ShooterConst.SHOOTER_POWER_RATIO += 0.1;
-        }else if(gamepad2.dpadDownWasPressed()){
+        }else if(gamepad2.xWasPressed()){
             ShooterConst.SHOOTER_POWER_RATIO -= 0.1;
         }
 
