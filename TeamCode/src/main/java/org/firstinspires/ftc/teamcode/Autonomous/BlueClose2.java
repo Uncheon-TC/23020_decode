@@ -27,7 +27,7 @@ public class BlueClose2 extends OpMode {
         DRIVE_TO_FIRST_AND_SHOOT,           // 경로 1 이동 및 첫 번째 발사
         DRIVE_TO_SECOND_INTAKE,             // 경로 2 이동 및 첫 번째 줄 수집
         DRIVE_TO_THIRD_SPINUP,              // 경로 3 복귀 및 슈터 가속
-        WAIT_FOR_SECOND_SHOT,               // 두 번째 발사 조건 확인
+        WAIT_FOR_SECOND_SHOT,               // 9두 번째 발사 조건 확인
         SECOND_FIRING,                      // 두 번째 발사 진행
         DRIVE_FOURTH_AND_FIFTH_INTAKE,      // 경로 4~5 체인 이동 및 수집
         DRIVE_TO_SIXTH_SPINUP,              // 경로 6 이동 및 슈터 가속
@@ -45,7 +45,7 @@ public class BlueClose2 extends OpMode {
     // 시작 후 너무 가까운 위치에서 발사하지 않도록 기다리는 시간이다.
     private static final double FIRST_SHOT_DELAY_SECONDS = 0.5;
     // 두 번째 발사부터 각 슈팅 위치에 도착한 뒤 기다리는 시간이다.
-    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.1;
+    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.5;
     // 한 번 발사할 때 아웃테이크를 유지하는 시간이다.
     private static final double FIRING_TIME_SECONDS = 0.5;
 
@@ -56,9 +56,11 @@ public class BlueClose2 extends OpMode {
     // 일반 경로에서 사용하는 최대 구동 출력이다.
     private static final double DEFAULT_PATH_MAX_POWER = 1.0;
     // SIXTH_POSE에서 GATE_POSE로 진입할 때만 사용하는 낮은 최대 출력이다.
-    private static final double GATE_APPROACH_MAX_POWER = 0.4;
+    private static final double GATE_APPROACH_MAX_POWER = 0.6;
 
-    private static final double BLUE_CLOSE_GOAL_X = 5.0; // 필요한 경우 수정
+    private static final double BLUE_CLOSE_GOAL_X = 3; // 필요한 경우 수정
+    private static final double BLUE_CLOSE_GOAL_Y = 140; // 필요한 경우 수정
+
 
     // 유물을 흡입하거나 슈터 방향으로 내보내는 인테이크 장치이다.
     private final ArtifactIntake artifactIntake = new ArtifactIntake();
@@ -86,11 +88,11 @@ public class BlueClose2 extends OpMode {
 
     // 경로 4의 끝이자 경로 5의 시작 위치이다.
     private static final Pose THIRD_POSE =
-            new Pose(23, 62, Math.toRadians(190));
+            new Pose(24, 62, Math.toRadians(190));
 
     // 두 번째 줄 수집 후 게이트를 살짝 여는 위치이다.
     private static final Pose FOURTH_POSE =
-            new Pose(23, 62, Math.toRadians(200));
+            new Pose(20, 60, Math.toRadians(200));//g
 
     // 세 번째 슈팅 및 반복 슈팅에 사용하는 위치이다.
     private static final Pose FIFTH_POSE =
@@ -98,11 +100,11 @@ public class BlueClose2 extends OpMode {
 
     // 게이트 진입 경로와 복귀 경로가 공통으로 지나는 중간 위치이다.
     private static final Pose SIXTH_POSE =
-            new Pose(28, 71.5, Math.toRadians(200));
+            new Pose(28, 68.5, Math.toRadians(200));
 
     // 게이트 안쪽에서 유물을 수집하는 최종 위치이다.
     private static final Pose GATE_POSE =
-            new Pose(13.5, 62.5  , Math.toRadians(153));
+            new Pose(13.5, 59.5  , Math.toRadians(153));
 
 
 
@@ -606,7 +608,7 @@ public class BlueClose2 extends OpMode {
         shotResult = shooter.aimAt(
                 pose,
                 BLUE_CLOSE_GOAL_X,
-                ShooterConst.BLUE_GOAL_Y,
+                BLUE_CLOSE_GOAL_Y,
                 velocity.getXComponent(),
                 velocity.getYComponent());
 
@@ -615,14 +617,14 @@ public class BlueClose2 extends OpMode {
             turret.trackPoint(
                     pose,
                     BLUE_CLOSE_GOAL_X,
-                    ShooterConst.BLUE_GOAL_Y,
+                    BLUE_CLOSE_GOAL_Y,
                     shotResult.turretOffset);
         } else {
             // 계산 결과가 없으면 속도 보정 없이 골대 좌표만 조준한다.
             turret.trackPoint(
                     pose,
                     BLUE_CLOSE_GOAL_X,
-                    ShooterConst.BLUE_GOAL_Y);
+                    BLUE_CLOSE_GOAL_Y);
         }
     }
 

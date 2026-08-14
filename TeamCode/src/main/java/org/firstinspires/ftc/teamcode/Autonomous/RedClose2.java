@@ -45,7 +45,7 @@ public class RedClose2 extends OpMode {
     // 시작 후 너무 가까운 위치에서 발사하지 않도록 기다리는 시간이다.
     private static final double FIRST_SHOT_DELAY_SECONDS = 0.5;
     // 두 번째 발사부터 각 슈팅 위치에 도착한 뒤 기다리는 시간이다.
-    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.1;
+    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.5;
     // 한 번 발사할 때 아웃테이크를 유지하는 시간이다.
     private static final double FIRING_TIME_SECONDS = 0.5;
 
