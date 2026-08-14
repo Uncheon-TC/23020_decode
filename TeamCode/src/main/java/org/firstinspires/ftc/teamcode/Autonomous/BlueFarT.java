@@ -43,7 +43,7 @@ public class BlueFarT extends OpMode {
     // 시작 위치에서 프리로드를 발사하기 전에 기다리는 시간이다.
     private static final double PRELOAD_SHOT_DELAY_SECONDS = 0.5;
     // 이동 경로가 끝난 뒤 두 번째 이후 발사 전에 기다리는 시간이다.
-    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 1;
+    private static final double POST_ARRIVAL_SHOT_DELAY_SECONDS = 0.5;
     // 세 개의 유물을 슈터로 밀어내는 아웃테이크 유지시간이다.
     private static final double FIRING_TIME_SECONDS = 0.5;
     // 벽이나 유물에 걸렸을 때 한 경로에서 무한히 머무르지 않게 하는 제한시간이다.
@@ -53,7 +53,7 @@ public class BlueFarT extends OpMode {
     // 이 시간이 되면 주차 성공 여부와 관계없이 OpMode를 종료한다.
     private static final double AUTO_END_SECONDS = 60.0;
     // BlueFarT에서만 사용하는 블루 골대 조준 X 좌표이다.
-    private static final double BLUE_FAR_GOAL_X = 0; // 필요한 경우 수정
+    private static final double BLUE_FAR_GOAL_X = 5; // 필요한 경우 수정
 
     // 시작 및 반복 슈팅 위치이다.
     private static final Pose START_POSE =
